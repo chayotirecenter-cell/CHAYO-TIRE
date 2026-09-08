@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAYO Servicio y Llantas - Sistema POS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        chayoRed: '#D32F2F',
+                        chayoGold: '#FFC107',
+                        chayoDark: '#121212',
+                        chayoGray: '#1E1E1E'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .active-tab {
+            border-bottom: 4px solid #D32F2F;
+            color: #D32F2F;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-chayoDark dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col font-sans">
+
+    <!-- BARRA SUPERIOR / HEADER -->
+    <header class="bg-white dark:bg-chayoGray shadow-md p-4 sticky top-0 z-50 transition-colors">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- LOGO Y NOMBRE -->
+            <div class="flex items-center space-x-4">
+                <img src="logo.png" alt="CHAYO Logo" class="h-14 w-auto object-contain" onerror="this.src='https://via.placeholder.com/150x80?text=CHAYO'">
+                <div>
+                    <h1 class="text-2xl font-black text-chayoRed tracking-wider uppercase">CHAYO</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-semibold">SERVICIO Y LLANTAS</p>
+                </div>
+            </div>
+
+            <!-- NAVEGACIÓN PRINCIPAL -->
+            <nav class="hidden md:flex space-x-8 text-lg font-medium">
+                <button onclick="switchTab('caja')" id="tab-btn-caja" class="py-2 px-1 active-tab transition"><i class="fa-solid fa-cash-register mr-2"></i>Caja (Punto de Venta)</button>
+                <button onclick="switchTab('ventas')" id="tab-btn-ventas" class="py-2 px-1 text-gray-500 hover:text-chayoRed transition"><i class="fa-solid fa-boxes-packing mr-2"></i>Gestión / Insumos</button>
+                <button onclick="switchTab('reportes')" id="tab-btn-reportes" class="py-2 px-1 text-gray-500 hover:text-chayoRed transition"><i class="fa-solid fa-chart-line mr-2"></i>Reportes e Ingresos</button>
+            </nav>
+
+            <!-- CONTROLES EXTRA (MODO NOCHE Y EXPORTAR) -->
+            <div class="flex items-center space-x-3">
+                <button onclick="exportData()" title="Descargar datos del día" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center">
+                    <i class="fa-solid fa-download mr-2"></i><span class="hidden sm:inline">Exportar Ventas</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-400 hover:bg-gray-300 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- NAV MOBILE -->
+        <div class="flex md:hidden justify-around mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <button onclick="switchTab('caja')" id="mob-tab-caja" class="text-chayoRed font-bold text-sm"><i class="fa-solid fa-cash-register block text-center text-lg"></i>Caja</button>
+            <button onclick="switchTab('ventas')" id="mob-tab-ventas" class="text-gray-500 text-sm"><i class="fa-solid fa-boxes-packing block text-center text-lg"></i>Gestión</button>
+            <button onclick="switchTab('reportes')" id="mob-tab-reportes" class="text-gray-500 text-sm"><i class="fa-solid fa-chart-line block text-center text-lg"></i>Reportes</button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto p-4 flex-grow w-full">
+
+        <!-- ================= PESTAÑA: CAJA ================= -->
+        <section id="tab-caja" class="space-y-6">
+            <!-- BARRA DE BÚSQUEDA Y ATAJOS -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-4">
+                    <!-- Búsqueda -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400 text-lg"></i>
+                        <input type="text" id="search-bar" onkeyup="filterItems()" placeholder="Buscar producto o servicio (Ej. Llantas, Lubricantes, Alineación...)" class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-chayoGray shadow-sm focus:ring-2 focus:ring-chayoRed outline-none text-lg">
+                    </div>
+
+                    <!-- Atajos de Productos Más Vendidos -->
+                    <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
+                        <h3 class="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 mb-3"><i class="fa-solid fa-fire text-chayoRed mr-1"></i> Atajos - Más Vendidos del Día</h3>
+                        <div id="shortcuts-container" class="flex flex-wrap gap-2">
+                            <!-- Inyectado vía JS -->
+                        </div>
+                    </div>
+
+                    <!-- Catálogo / Lista de Productos y Servicios -->
+                    <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-lg mb-3">Catálogo Disponible</h3>
+                        <div id="catalog-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+                            <!-- Inyectado vía JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORMULARIO DE COBRO / BOLETA -->
+                <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-t-4 border-chayoRed flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold border-b pb-2 dark:border-gray-700 flex justify-between items-center">
+                            <span><i class="fa-solid fa-receipt mr-2 text-chayoRed"></i>Detalle de Venta</span>
+                            <span class="text-xs bg-red-100 dark:bg-red-900 text-chayoRed dark:text-red-200 px-2 py-1 rounded">Soles (S/.)</span>
+                        </h2>
+
+                        <!-- Datos del Cliente -->
+                        <div class="grid grid-cols-2 gap-2 my-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">Cliente</label>
+                                <input type="text" id="cart-client" placeholder="Nombre completo" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">Placa Vehículo</label>
+                                <input type="text" id="cart-plate" placeholder="Ej. ABC-123" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 uppercase font-mono text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Lista de Ítems en el Carrito -->
+                        <div class="max-h-48 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
+                                    <tr>
+                                        <th class="p-1">Item</th>
+                                        <th class="p-1 text-center">Cant.</th>
+                                        <th class="p-1 text-right">Total</th>
+                                        <th class="p-1 text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart-table-body">
+                                    <!-- Inyectado dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Descuentos y Pagos -->
+                        <div class="space-y-3">
+                            <!-- Descuento -->
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-sm font-medium">Descuento:</span>
+                                <div class="flex space-x-1 w-2/3">
+                                    <input type="number" id="discount-val" value="0" min="0" onchange="calculateTotals()" onkeyup="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-right text-sm">
+                                    <select id="discount-type" onchange="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                                        <option value="soles">S/.</option>
+                                        <option value="percent">%</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Medio de Pago (Botones) -->
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Medio de Pago</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" onclick="selectPayment('efectivo')" id="pay-efectivo" class="py-2 rounded-lg border-2 border-green-600 bg-green-50 dark:bg-green-950 font-semibold text-green-700 dark:text-green-300 text-sm flex items-center justify-center">
+                                        <i class="fa-solid fa-money-bill-wave mr-2"></i>Efectivo
+                                    </button>
+                                    <button type="button" onclick="selectPayment('yape')" id="pay-yape" class="py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center">
+                                        <i class="fa-solid fa-mobile-screen mr-2"></i>Yape
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Cálculo de Vuelto (Si es Efectivo) -->
+                            <div id="cash-calculation-box" class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg space-y-2">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span>Monto Recibido:</span>
+                                    <input type="number" id="amount-paid" placeholder="0.00" onkeyup="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-700 dark:border-gray-600 text-sm">
+                                </div>
+                                <div class="flex justify-between items-center font-bold text-sm">
+                                    <span>Vuelto a Devolver:</span>
+                                    <span id="change-amount" class="text-green-600 dark:text-green-400">S/. 0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOTALES Y BOTÓN FINAL -->
+                    <div class="mt-4 border-t pt-3 dark:border-gray-700">
+                        <div class="flex justify-between text-lg font-black mb-3">
+                            <span>TOTAL A PAGAR:</span>
+                            <span id="cart-total-text" class="text-chayoRed">S/. 0.00</span>
+                        </div>
+                        <button onclick="processSale()" class="w-full bg-chayoRed hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200 text-center uppercase tracking-wide">
+                            <i class="fa-solid fa-circle-check mr-2"></i>Completar Venta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= PESTAÑA: VENTAS Y GESTIÓN ================= -->
+        <section id="tab-ventas" class="hidden space-y-8">
+            <!-- TARJETA SUPERIOR: TOTAL COSTO COMPRA -->
+            <div class="bg-gradient-to-r from-red-600 to-chayoRed text-white p-6 rounded-xl shadow-md flex justify-between items-center">
+                <div>
+                    <p class="text-sm uppercase font-semibold tracking-wider text-red-100">Inversión Total en Insumos/Productos (Costo de Compra Total)</p>
+                    <h2 id="total-purchase-cost" class="text-3xl font-black mt-1">S/. 0.00</h2>
+                </div>
+                <i class="fa-solid fa-boxes-stacked text-5xl opacity-30"></i>
+            </div>
+
+            <!-- REGISTRO DE PRODUCTOS -->
+            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4">
+                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed"><i class="fa-solid fa-box mr-2"></i>Añadir o Registrar Producto</h3>
+                <form id="form-add-product" onsubmit="addProduct(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <input type="text" id="prod-name" placeholder="Nombre del Producto" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <div>
+                        <label class="text-xs text-gray-500">Costo Compra (S/.)</label>
+                        <input type="number" step="0.1" id="prod-buy-cost" placeholder="0.00" onkeyup="calcProductProfit()" required class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500">Valor Venta (S/.)</label>
+                        <input type="number" step="0.1" id="prod-sell-price" placeholder="0.00" onkeyup="calcProductProfit()" required class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500">Cantidad Stock</label>
+                        <input type="number" id="prod-qty" placeholder="1" required class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500">Ganancia Est. (S/.)</label>
+                        <input type="text" id="prod-profit" readonly placeholder="0.00" class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-900 font-bold text-green-600">
+                    </div>
+                    <div class="md:col-span-5 text-right">
+                        <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Producto</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- REGISTRO DE SERVICIOS -->
+            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4">
+                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed"><i class="fa-solid fa-wrench mr-2"></i>Añadir o Registrar Servicio</h3>
+                <form id="form-add-service" onsubmit="addService(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <input type="text" id="serv-name" placeholder="Servicio (Ej. Enllante, Balanceo)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <input type="text" id="serv-tire-num" placeholder="N° de Llanta (Ej. N° 15, R16, N/A)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <input type="number" step="0.1" id="serv-cost" placeholder="Costo del Servicio (S/.)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Servicio</button>
+                </form>
+            </div>
+        </section>
+
+
+        <!-- ================= PESTAÑA: REPORTES E INGRESOS ================= -->
+        <section id="tab-reportes" class="hidden space-y-6">
+            <!-- BOTONES DE FILTRO TEMPORAL -->
+            <div class="flex justify-between items-center flex-wrap gap-3">
+                <h2 class="text-2xl font-bold">Reporte de Ingresos</h2>
+                <div class="inline-flex rounded-md shadow-sm" role="group">
+                    <button onclick="updateCharts('day')" id="btn-time-day" class="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 rounded-l-lg bg-chayoRed text-white">Día</button>
+                    <button onclick="updateCharts('week')" id="btn-time-week" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">Semana</button>
+                    <button onclick="updateCharts('month')" id="btn-time-month" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">Mes</button>
+                    <button onclick="updateCharts('year')" id="btn-time-year" class="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 rounded-r-lg bg-white dark:bg-gray-800">Año</button>
+                </div>
+            </div>
+
+            <!-- CUADROS DE TOTALES -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-l-4 border-blue-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Servicios Brindados</p>
+                    <h3 id="report-total-services" class="text-2xl font-black mt-1">S/. 0.00</h3>
+                </div>
+                <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-l-4 border-yellow-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Productos Vendidos</p>
+                    <h3 id="report-total-products" class="text-2xl font-black mt-1">S/. 0.00</h3>
+                </div>
+                <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-l-4 border-green-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Ingresos Totales Combinados</p>
+                    <h3 id="report-total-combined" class="text-3xl font-black text-green-600 dark:text-green-400 mt-1">S/. 0.00</h3>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS (BARRAS Y LÍNEAS) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
+                    <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Comparativa Servicios vs Productos (Barras)</h3>
+                    <div class="relative h-64">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
+                    <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Tendencia de Ingresos Totales (Líneas)</h3>
+                    <div class="relative h-64">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+        // ESTADO GLOBAL DE LA APLICACIÓN
+        let itemsCatalog = [
+            { id: 1, type: 'servicio', name: 'Alineación y Balanceo', tireNum: 'R15', price: 50.00, salesCount: 12 },
+            { id: 2, type: 'producto', name: 'Aceite de Motor Castrol 20W50', buyCost: 80.00, price: 110.00, stock: 20, salesCount: 25 },
+            { id: 3, type: 'servicio', name: 'Parche de Llanta', tireNum: 'N° 16', price: 15.00, salesCount: 40 },
+            { id: 4, type: 'producto', name: 'Llanta Goodyear 185/65 R15', buyCost: 180.00, price: 240.00, stock: 8, salesCount: 18 }
+        ];
+
+        let cart = [];
+        let salesHistory = [];
+        let selectedPaymentMethod = 'efectivo';
+        let barChartInstance = null;
+        let lineChartInstance = null;
+
+        // INICIALIZACIÓN
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFromStorage();
+            renderCatalog();
+            renderShortcuts();
+            renderCart();
+            updateTotalPurchaseCost();
+            initCharts();
+        });
+
+        // CAMBIO DE PESTAÑAS
+        function switchTab(tabName) {
+            ['caja', 'ventas', 'reportes'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).classList.remove('active-tab');
+                document.getElementById(`tab-btn-${t}`).classList.add('text-gray-500');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active-tab');
+            document.getElementById(`tab-btn-${tabName}`).classList.remove('text-gray-500');
+
+            if(tabName === 'reportes') {
+                updateCharts('day');
+            }
+        }
+
+        // MODO NOCHE
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                html.classList.add('dark');
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+
+        // SELECCIÓN MEDIO DE PAGO
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            const btnEf = document.getElementById('pay-efectivo');
+            const btnYape = document.getElementById('pay-yape');
+            const cashBox = document.getElementById('cash-calculation-box');
+
+            if (method === 'efectivo') {
+                btnEf.className = "py-2 rounded-lg border-2 border-green-600 bg-green-50 dark:bg-green-950 font-semibold text-green-700 dark:text-green-300 text-sm flex items-center justify-center";
+                btnYape.className = "py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center";
+                cashBox.classList.remove('hidden');
+            } else {
+                btnYape.className = "py-2 rounded-lg border-2 border-purple-600 bg-purple-50 dark:bg-purple-950 font-semibold text-purple-700 dark:text-purple-300 text-sm flex items-center justify-center";
+                btnEf.className = "py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center";
+                cashBox.classList.add('hidden');
+            }
+        }
+
+        // RENDERIZAR CATALOGO
+        function renderCatalog(filter = "") {
+            const container = document.getElementById('catalog-list');
+            container.innerHTML = "";
+
+            const filtered = itemsCatalog.filter(i => i.name.toLowerCase().includes(filter.toLowerCase()));
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 border rounded-lg dark:border-gray-700 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition";
+                card.onclick = () => addToCart(item.id);
+                card.innerHTML = `
+                    <div>
+                        <p class="font-bold text-sm">${item.name}</p>
+                        <p class="text-xs text-gray-500">${item.type === 'servicio' ? 'Servicio (Llanta: ' + item.tireNum + ')' : 'Producto (Stock: ' + item.stock + ')'}</p>
+                        <p class="text-sm font-bold text-chayoRed">S/. ${item.price.toFixed(2)}</p>
+                    </div>
+                    <button class="bg-chayoRed text-white p-2 rounded-lg text-xs"><i class="fa-solid fa-plus"></i></button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterItems() {
+            const query = document.getElementById('search-bar').value;
+            renderCatalog(query);
+        }
+
+        // ATAJOS
+        function renderShortcuts() {
+            const container = document.getElementById('shortcuts-container');
+            container.innerHTML = "";
+            const sorted = [...itemsCatalog].sort((a,b) => b.salesCount - a.salesCount).slice(0, 4);
+
+            sorted.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = "bg-red-50 dark:bg-gray-800 border border-red-200 dark:border-gray-700 hover:border-chayoRed text-xs p-2 rounded-lg flex items-center space-x-1 font-semibold";
+                btn.onclick = () => addToCart(item.id);
+                btn.innerHTML = `<span>${item.name}</span> <span class="text-chayoRed">S/. ${item.price.toFixed(2)}</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        // CARRITO DE COMPRAS
+        function addToCart(id) {
+            const item = itemsCatalog.find(i => i.id === id);
+            const inCart = cart.find(c => c.id === id);
+            if(inCart) {
+                inCart.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const tbody = document.getElementById('cart-table-body');
+            tbody.innerHTML = "";
+
+            cart.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b dark:border-gray-800";
+                tr.innerHTML = `
+                    <td class="p-1">${item.name}</td>
+                    <td class="p-1 text-center">${item.qty}</td>
+                    <td class="p-1 text-right font-bold">S/. ${(item.price * item.qty).toFixed(2)}</td>
+                    <td class="p-1 text-center"><button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            calculateTotals();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function calculateTotals() {
+            let subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            let discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
+            let discountType = document.getElementById('discount-type').value;
+
+            let discount = 0;
+            if(discountType === 'soles') {
+                discount = discountVal;
+            } else {
+                discount = (subtotal * discountVal) / 100;
+            }
+
+            let total = Math.max(0, subtotal - discount);
+            document.getElementById('cart-total-text').innerText = `S/. ${total.toFixed(2)}`;
+
+            // Cálculo Vuelto
+            let paid = parseFloat(document.getElementById('amount-paid').value) || 0;
+            let change = paid - total;
+            document.getElementById('change-amount').innerText = `S/. ${change > 0 ? change.toFixed(2) : '0.00'}`;
+
+            return total;
+        }
+
+        // PROCESAR VENTA
+        function processSale() {
+            if(cart.length === 0) return alert("Añade al menos un producto o servicio al carrito.");
+
+            const total = calculateTotals();
+            const client = document.getElementById('cart-client').value || "Cliente Varios";
+            const plate = document.getElementById('cart-plate').value || "S/P";
+
+            const sale = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                client,
+                plate,
+                items: [...cart],
+                paymentMethod: selectedPaymentMethod,
+                total
+            };
+
+            salesHistory.push(sale);
+            
+            // Aumentar contador para productos más vendidos
+            cart.forEach(cItem => {
+                let catItem = itemsCatalog.find(i => i.id === cItem.id);
+                if(catItem) catItem.salesCount += cItem.qty;
+            });
+
+            saveToStorage();
+
+            alert("✅ Venta registrada correctamente");
+            cart = [];
+            document.getElementById('cart-client').value = "";
+            document.getElementById('cart-plate').value = "";
+            document.getElementById('amount-paid').value = "";
+            renderCart();
+            renderShortcuts();
+        }
+
+        // VENTAS Y GESTIÓN FORMULARIOS
+        function calcProductProfit() {
+            let buy = parseFloat(document.getElementById('prod-buy-cost').value) || 0;
+            let sell = parseFloat(document.getElementById('prod-sell-price').value) || 0;
+            document.getElementById('prod-profit').value = (sell - buy).toFixed(2);
+        }
+
+        function addProduct(e) {
+            e.preventDefault();
+            const newProd = {
+                id: Date.now(),
+                type: 'producto',
+                name: document.getElementById('prod-name').value,
+                buyCost: parseFloat(document.getElementById('prod-buy-cost').value),
+                price: parseFloat(document.getElementById('prod-sell-price').value),
+                stock: parseInt(document.getElementById('prod-qty').value),
+                salesCount: 0
+            };
+            itemsCatalog.push(newProd);
+            saveToStorage();
+            renderCatalog();
+            updateTotalPurchaseCost();
+            e.target.reset();
+            alert("Producto añadido al inventario.");
+        }
+
+        function addService(e) {
+            e.preventDefault();
+            const newServ = {
+                id: Date.now(),
+                type: 'servicio',
+                name: document.getElementById('serv-name').value,
+                tireNum: document.getElementById('serv-tire-num').value,
+                price: parseFloat(document.getElementById('serv-cost').value),
+                salesCount: 0
+            };
+            itemsCatalog.push(newServ);
+            saveToStorage();
+            renderCatalog();
+            e.target.reset();
+            alert("Servicio añadido al catálogo.");
+        }
+
+        function updateTotalPurchaseCost() {
+            let totalCost = itemsCatalog
+                .filter(i => i.type === 'producto')
+                .reduce((acc, i) => acc + ((i.buyCost || 0) * (i.stock || 0)), 0);
+            document.getElementById('total-purchase-cost').innerText = `S/. ${totalCost.toFixed(2)}`;
+        }
+
+        // REPORTES Y GRÁFICOS (CHART.JS)
+        function initCharts() {
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Servicios', 'Productos'],
+                    datasets: [{
+                        label: 'Ingresos (S/.)',
+                        data: [0, 0],
+                        backgroundColor: ['#3B82F6', '#EAB308']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['P1', 'P2', 'P3', 'P4'],
+                    datasets: [{
+                        label: 'Ingresos Totales',
+                        data: [0, 0, 0, 0],
+                        borderColor: '#D32F2F',
+                        tension: 0.3,
+                        fill: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function updateCharts(timeframe) {
+            // Estilos de botones
+            ['day', 'week', 'month', 'year'].forEach(t => {
+                const btn = document.getElementById(`btn-time-${t}`);
+                if(t === timeframe) {
+                    btn.className = "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-chayoRed text-white";
+                } else {
+                    btn.className = "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800";
+                }
+            });
+
+            // Cálculos ficticios/dinámicos filtrando por ventas
+            let totalServ = 0;
+            let totalProd = 0;
+
+            salesHistory.forEach(s => {
+                s.items.forEach(i => {
+                    if(i.type === 'servicio') totalServ += (i.price * i.qty);
+                    if(i.type === 'producto') totalProd += (i.price * i.qty);
+                });
+            });
+
+            document.getElementById('report-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
+            document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
+            document.getElementById('report-total-combined').innerText = `S/. ${(totalServ + totalProd).toFixed(2)}`;
+
+            // Actualizar Gráficos
+            barChartInstance.data.datasets[0].data = [totalServ, totalProd];
+            barChartInstance.update();
+
+            lineChartInstance.data.datasets[0].data = [totalServ * 0.2, totalServ * 0.5, totalProd * 0.4, totalServ + totalProd];
+            lineChartInstance.update();
+        }
+
+        // PERSISTENCIA DE DATOS
+        function saveToStorage() {
+            localStorage.setItem('chayo_catalog', JSON.stringify(itemsCatalog));
+            localStorage.setItem('chayo_sales', JSON.stringify(salesHistory));
+        }
+
+        function loadFromStorage() {
+            const cat = localStorage.getItem('chayo_catalog');
+            const sales = localStorage.getItem('chayo_sales');
+            if(cat) itemsCatalog = JSON.parse(cat);
+            if(sales) salesHistory = JSON.parse(sales);
+        }
+
+        // DESCARGAR/EXPORTAR DATOS PARA TABLET
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(salesHistory, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `ventas_chayo_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>
