@@ -54,7 +54,7 @@
                 <button onclick="switchTab('reportes')" id="tab-btn-reportes" class="py-2 px-1 text-gray-500 hover:text-chayoRed transition"><i class="fa-solid fa-chart-line mr-2"></i>Reportes e Ingresos</button>
             </nav>
 
-            <!-- CONTROLES EXTRA (MODO NOCHE Y EXPORTAR) -->
+            <!-- CONTROLES EXTRA -->
             <div class="flex items-center space-x-3">
                 <button onclick="exportData()" title="Descargar datos del día" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center">
                     <i class="fa-solid fa-download mr-2"></i><span class="hidden sm:inline">Exportar Ventas</span>
@@ -78,24 +78,23 @@
 
         <!-- ================= PESTAÑA: CAJA ================= -->
         <section id="tab-caja" class="space-y-6">
-            <!-- BARRA DE BÚSQUEDA Y ATAJOS -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
                     <!-- Búsqueda -->
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400 text-lg"></i>
-                        <input type="text" id="search-bar" onkeyup="filterItems()" placeholder="Buscar producto o servicio (Ej. Llantas, Lubricantes, Alineación...)" class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-chayoGray shadow-sm focus:ring-2 focus:ring-chayoRed outline-none text-lg">
+                        <input type="text" id="search-bar" onkeyup="filterItems()" placeholder="Buscar producto o servicio registrado..." class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-chayoGray shadow-sm focus:ring-2 focus:ring-chayoRed outline-none text-lg">
                     </div>
 
-                    <!-- Atajos de Productos Más Vendidos -->
+                    <!-- Atajos de Más Vendidos -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
                         <h3 class="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 mb-3"><i class="fa-solid fa-fire text-chayoRed mr-1"></i> Atajos - Más Vendidos del Día</h3>
                         <div id="shortcuts-container" class="flex flex-wrap gap-2">
-                            <!-- Inyectado vía JS -->
+                            <span class="text-sm text-gray-400">Aún no hay ventas registradas hoy.</span>
                         </div>
                     </div>
 
-                    <!-- Catálogo / Lista de Productos y Servicios -->
+                    <!-- Catálogo -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
                         <h3 class="font-bold text-lg mb-3">Catálogo Disponible</h3>
                         <div id="catalog-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
@@ -104,7 +103,7 @@
                     </div>
                 </div>
 
-                <!-- FORMULARIO DE COBRO / BOLETA -->
+                <!-- DETALLE DE VENTA -->
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-t-4 border-chayoRed flex flex-col justify-between">
                     <div>
                         <h2 class="text-xl font-bold border-b pb-2 dark:border-gray-700 flex justify-between items-center">
@@ -124,7 +123,7 @@
                             </div>
                         </div>
 
-                        <!-- Lista de Ítems en el Carrito -->
+                        <!-- Lista Carrito -->
                         <div class="max-h-48 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
@@ -136,14 +135,12 @@
                                     </tr>
                                 </thead>
                                 <tbody id="cart-table-body">
-                                    <!-- Inyectado dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Descuentos y Pagos -->
                         <div class="space-y-3">
-                            <!-- Descuento -->
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm font-medium">Descuento:</span>
                                 <div class="flex space-x-1 w-2/3">
@@ -155,7 +152,6 @@
                                 </div>
                             </div>
 
-                            <!-- Medio de Pago (Botones) -->
                             <div>
                                 <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Medio de Pago</label>
                                 <div class="grid grid-cols-2 gap-2">
@@ -168,7 +164,6 @@
                                 </div>
                             </div>
 
-                            <!-- Cálculo de Vuelto (Si es Efectivo) -->
                             <div id="cash-calculation-box" class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg space-y-2">
                                 <div class="flex justify-between items-center text-sm">
                                     <span>Monto Recibido:</span>
@@ -182,7 +177,6 @@
                         </div>
                     </div>
 
-                    <!-- TOTALES Y BOTÓN FINAL -->
                     <div class="mt-4 border-t pt-3 dark:border-gray-700">
                         <div class="flex justify-between text-lg font-black mb-3">
                             <span>TOTAL A PAGAR:</span>
@@ -196,13 +190,11 @@
             </div>
         </section>
 
-
         <!-- ================= PESTAÑA: VENTAS Y GESTIÓN ================= -->
         <section id="tab-ventas" class="hidden space-y-8">
-            <!-- TARJETA SUPERIOR: TOTAL COSTO COMPRA -->
             <div class="bg-gradient-to-r from-red-600 to-chayoRed text-white p-6 rounded-xl shadow-md flex justify-between items-center">
                 <div>
-                    <p class="text-sm uppercase font-semibold tracking-wider text-red-100">Inversión Total en Insumos/Productos (Costo de Compra Total)</p>
+                    <p class="text-sm uppercase font-semibold tracking-wider text-red-100">Inversión Total en Productos (Costo de Compra Total)</p>
                     <h2 id="total-purchase-cost" class="text-3xl font-black mt-1">S/. 0.00</h2>
                 </div>
                 <i class="fa-solid fa-boxes-stacked text-5xl opacity-30"></i>
@@ -230,9 +222,31 @@
                         <input type="text" id="prod-profit" readonly placeholder="0.00" class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-900 font-bold text-green-600">
                     </div>
                     <div class="md:col-span-5 text-right">
-                        <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Producto</button>
+                        <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"><i class="fa-solid fa-plus mr-1"></i> Guardar Producto</button>
                     </div>
                 </form>
+            </div>
+
+            <!-- LISTA Y EDICIÓN DE PRODUCTOS REGISTRADOS -->
+            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4">
+                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed"><i class="fa-solid fa-list-check mr-2"></i>Productos Registrados</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-500 uppercase bg-gray-100 dark:bg-gray-800">
+                            <tr>
+                                <th class="p-3">Nombre</th>
+                                <th class="p-3">Costo Compra</th>
+                                <th class="p-3">Precio Venta</th>
+                                <th class="p-3">Ganancia Un.</th>
+                                <th class="p-3">Stock</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body">
+                            <!-- Inyectado por JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- REGISTRO DE SERVICIOS -->
@@ -242,15 +256,33 @@
                     <input type="text" id="serv-name" placeholder="Servicio (Ej. Enllante, Balanceo)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <input type="text" id="serv-tire-num" placeholder="N° de Llanta (Ej. N° 15, R16, N/A)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <input type="number" step="0.1" id="serv-cost" placeholder="Costo del Servicio (S/.)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
-                    <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Servicio</button>
+                    <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"><i class="fa-solid fa-plus mr-1"></i> Guardar Servicio</button>
                 </form>
+            </div>
+
+            <!-- LISTA Y EDICIÓN DE SERVICIOS REGISTRADOS -->
+            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4">
+                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed"><i class="fa-solid fa-list-check mr-2"></i>Servicios Registrados</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-500 uppercase bg-gray-100 dark:bg-gray-800">
+                            <tr>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">N° Llanta</th>
+                                <th class="p-3">Costo/Precio</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-table-body">
+                            <!-- Inyectado por JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
-
         <!-- ================= PESTAÑA: REPORTES E INGRESOS ================= -->
         <section id="tab-reportes" class="hidden space-y-6">
-            <!-- BOTONES DE FILTRO TEMPORAL -->
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <h2 class="text-2xl font-bold">Reporte de Ingresos</h2>
                 <div class="inline-flex rounded-md shadow-sm" role="group">
@@ -261,7 +293,6 @@
                 </div>
             </div>
 
-            <!-- CUADROS DE TOTALES -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-l-4 border-blue-500">
                     <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Servicios Brindados</p>
@@ -277,7 +308,6 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS (BARRAS Y LÍNEAS) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
                     <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Comparativa Servicios vs Productos (Barras)</h3>
@@ -296,16 +326,50 @@
 
     </main>
 
+    <!-- MODAL DE EDICIÓN DE ÍTEM -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-chayoGray rounded-xl p-6 w-full max-w-md space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-chayoRed flex justify-between items-center">
+                <span>Editar Registro</span>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </h3>
+            <input type="hidden" id="edit-id">
+            <input type="hidden" id="edit-type">
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Nombre / Servicio</label>
+                    <input type="text" id="edit-name" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                </div>
+                <div id="edit-tire-box">
+                    <label class="text-xs font-bold text-gray-500">N° de Llanta</label>
+                    <input type="text" id="edit-tire" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                </div>
+                <div id="edit-buy-box">
+                    <label class="text-xs font-bold text-gray-500">Costo Compra (S/.)</label>
+                    <input type="number" step="0.1" id="edit-buy" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Precio Venta / Costo Servicio (S/.)</label>
+                    <input type="number" step="0.1" id="edit-price" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                </div>
+                <div id="edit-stock-box">
+                    <label class="text-xs font-bold text-gray-500">Stock Disponible</label>
+                    <input type="number" id="edit-stock" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeEditModal()" class="px-4 py-2 border rounded text-sm font-bold">Cancelar</button>
+                <button onclick="saveEditModal()" class="px-4 py-2 bg-chayoRed text-white rounded text-sm font-bold">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <!-- LÓGICA JAVASCRIPT -->
     <script>
-        // ESTADO GLOBAL DE LA APLICACIÓN
-        let itemsCatalog = [
-            { id: 1, type: 'servicio', name: 'Alineación y Balanceo', tireNum: 'R15', price: 50.00, salesCount: 12 },
-            { id: 2, type: 'producto', name: 'Aceite de Motor Castrol 20W50', buyCost: 80.00, price: 110.00, stock: 20, salesCount: 25 },
-            { id: 3, type: 'servicio', name: 'Parche de Llanta', tireNum: 'N° 16', price: 15.00, salesCount: 40 },
-            { id: 4, type: 'producto', name: 'Llanta Goodyear 185/65 R15', buyCost: 180.00, price: 240.00, stock: 8, salesCount: 18 }
-        ];
-
+        // ESTADO GLOBAL (Catálogo iniciado en blanco)
+        let itemsCatalog = [];
         let cart = [];
         let salesHistory = [];
         let selectedPaymentMethod = 'efectivo';
@@ -318,6 +382,7 @@
             renderCatalog();
             renderShortcuts();
             renderCart();
+            renderManagementTables();
             updateTotalPurchaseCost();
             initCharts();
         });
@@ -338,7 +403,6 @@
             }
         }
 
-        // MODO NOCHE
         function toggleDarkMode() {
             const html = document.documentElement;
             const icon = document.getElementById('theme-icon');
@@ -351,7 +415,6 @@
             }
         }
 
-        // SELECCIÓN MEDIO DE PAGO
         function selectPayment(method) {
             selectedPaymentMethod = method;
             const btnEf = document.getElementById('pay-efectivo');
@@ -369,12 +432,17 @@
             }
         }
 
-        // RENDERIZAR CATALOGO
+        // CATÁLOGO CAJA
         function renderCatalog(filter = "") {
             const container = document.getElementById('catalog-list');
             container.innerHTML = "";
 
             const filtered = itemsCatalog.filter(i => i.name.toLowerCase().includes(filter.toLowerCase()));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-sm text-gray-400 col-span-2 text-center py-4">No hay ítems registrados. Añádelos en la pestaña "Gestión / Insumos".</p>`;
+                return;
+            }
 
             filtered.forEach(item => {
                 const card = document.createElement('div');
@@ -401,7 +469,12 @@
         function renderShortcuts() {
             const container = document.getElementById('shortcuts-container');
             container.innerHTML = "";
-            const sorted = [...itemsCatalog].sort((a,b) => b.salesCount - a.salesCount).slice(0, 4);
+            const sorted = [...itemsCatalog].filter(x => x.salesCount > 0).sort((a,b) => b.salesCount - a.salesCount).slice(0, 4);
+
+            if(sorted.length === 0) {
+                container.innerHTML = `<span class="text-xs text-gray-400">Aún no hay atajos. Aparecerán aquí según lo más vendido.</span>`;
+                return;
+            }
 
             sorted.forEach(item => {
                 const btn = document.createElement('button');
@@ -412,7 +485,7 @@
             });
         }
 
-        // CARRITO DE COMPRAS
+        // CARRITO
         function addToCart(id) {
             const item = itemsCatalog.find(i => i.id === id);
             const inCart = cart.find(c => c.id === id);
@@ -453,17 +526,11 @@
             let discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
             let discountType = document.getElementById('discount-type').value;
 
-            let discount = 0;
-            if(discountType === 'soles') {
-                discount = discountVal;
-            } else {
-                discount = (subtotal * discountVal) / 100;
-            }
+            let discount = discountType === 'soles' ? discountVal : (subtotal * discountVal) / 100;
 
             let total = Math.max(0, subtotal - discount);
             document.getElementById('cart-total-text').innerText = `S/. ${total.toFixed(2)}`;
 
-            // Cálculo Vuelto
             let paid = parseFloat(document.getElementById('amount-paid').value) || 0;
             let change = paid - total;
             document.getElementById('change-amount').innerText = `S/. ${change > 0 ? change.toFixed(2) : '0.00'}`;
@@ -471,7 +538,6 @@
             return total;
         }
 
-        // PROCESAR VENTA
         function processSale() {
             if(cart.length === 0) return alert("Añade al menos un producto o servicio al carrito.");
 
@@ -491,10 +557,12 @@
 
             salesHistory.push(sale);
             
-            // Aumentar contador para productos más vendidos
             cart.forEach(cItem => {
                 let catItem = itemsCatalog.find(i => i.id === cItem.id);
-                if(catItem) catItem.salesCount += cItem.qty;
+                if(catItem) {
+                    catItem.salesCount += cItem.qty;
+                    if(catItem.type === 'producto') catItem.stock = Math.max(0, catItem.stock - cItem.qty);
+                }
             });
 
             saveToStorage();
@@ -505,10 +573,12 @@
             document.getElementById('cart-plate').value = "";
             document.getElementById('amount-paid').value = "";
             renderCart();
+            renderCatalog();
+            renderManagementTables();
             renderShortcuts();
         }
 
-        // VENTAS Y GESTIÓN FORMULARIOS
+        // GESTIÓN Y RENDERIZADO DE TABLAS
         function calcProductProfit() {
             let buy = parseFloat(document.getElementById('prod-buy-cost').value) || 0;
             let sell = parseFloat(document.getElementById('prod-sell-price').value) || 0;
@@ -529,9 +599,11 @@
             itemsCatalog.push(newProd);
             saveToStorage();
             renderCatalog();
+            renderManagementTables();
             updateTotalPurchaseCost();
             e.target.reset();
-            alert("Producto añadido al inventario.");
+            document.getElementById('prod-profit').value = "0.00";
+            alert("Producto añadido.");
         }
 
         function addService(e) {
@@ -547,8 +619,121 @@
             itemsCatalog.push(newServ);
             saveToStorage();
             renderCatalog();
+            renderManagementTables();
             e.target.reset();
-            alert("Servicio añadido al catálogo.");
+            alert("Servicio añadido.");
+        }
+
+        function renderManagementTables() {
+            const prodBody = document.getElementById('products-table-body');
+            const servBody = document.getElementById('services-table-body');
+            prodBody.innerHTML = "";
+            servBody.innerHTML = "";
+
+            const products = itemsCatalog.filter(i => i.type === 'producto');
+            const services = itemsCatalog.filter(i => i.type === 'servicio');
+
+            if(products.length === 0) {
+                prodBody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">No hay productos registrados.</td></tr>`;
+            } else {
+                products.forEach(p => {
+                    const profit = (p.price - p.buyCost).toFixed(2);
+                    prodBody.innerHTML += `
+                        <tr class="border-b dark:border-gray-700">
+                            <td class="p-3 font-semibold">${p.name}</td>
+                            <td class="p-3">S/. ${p.buyCost.toFixed(2)}</td>
+                            <td class="p-3">S/. ${p.price.toFixed(2)}</td>
+                            <td class="p-3 text-green-600 font-bold">S/. ${profit}</td>
+                            <td class="p-3">${p.stock}</td>
+                            <td class="p-3 text-center space-x-2">
+                                <button onclick="openEditModal(${p.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteItem(${p.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            if(services.length === 0) {
+                servBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay servicios registrados.</td></tr>`;
+            } else {
+                services.forEach(s => {
+                    servBody.innerHTML += `
+                        <tr class="border-b dark:border-gray-700">
+                            <td class="p-3 font-semibold">${s.name}</td>
+                            <td class="p-3">${s.tireNum}</td>
+                            <td class="p-3 font-bold text-chayoRed">S/. ${s.price.toFixed(2)}</td>
+                            <td class="p-3 text-center space-x-2">
+                                <button onclick="openEditModal(${s.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteItem(${s.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        // FUNCIONES DE EDICIÓN Y ELIMINACIÓN
+        function deleteItem(id) {
+            if(confirm("¿Estás seguro de eliminar este ítem?")) {
+                itemsCatalog = itemsCatalog.filter(i => i.id !== id);
+                saveToStorage();
+                renderCatalog();
+                renderManagementTables();
+                updateTotalPurchaseCost();
+            }
+        }
+
+        function openEditModal(id) {
+            const item = itemsCatalog.find(i => i.id === id);
+            if(!item) return;
+
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('edit-type').value = item.type;
+            document.getElementById('edit-name').value = item.name;
+            document.getElementById('edit-price').value = item.price;
+
+            if(item.type === 'producto') {
+                document.getElementById('edit-buy-box').classList.remove('hidden');
+                document.getElementById('edit-stock-box').classList.remove('hidden');
+                document.getElementById('edit-tire-box').classList.add('hidden');
+                document.getElementById('edit-buy').value = item.buyCost;
+                document.getElementById('edit-stock').value = item.stock;
+            } else {
+                document.getElementById('edit-buy-box').classList.add('hidden');
+                document.getElementById('edit-stock-box').classList.add('hidden');
+                document.getElementById('edit-tire-box').classList.remove('hidden');
+                document.getElementById('edit-tire').value = item.tireNum;
+            }
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function saveEditModal() {
+            const id = parseInt(document.getElementById('edit-id').value);
+            const item = itemsCatalog.find(i => i.id === id);
+            if(!item) return;
+
+            item.name = document.getElementById('edit-name').value;
+            item.price = parseFloat(document.getElementById('edit-price').value) || 0;
+
+            if(item.type === 'producto') {
+                item.buyCost = parseFloat(document.getElementById('edit-buy').value) || 0;
+                item.stock = parseInt(document.getElementById('edit-stock').value) || 0;
+            } else {
+                item.tireNum = document.getElementById('edit-tire').value;
+            }
+
+            saveToStorage();
+            closeEditModal();
+            renderCatalog();
+            renderManagementTables();
+            updateTotalPurchaseCost();
+            alert("Cambios guardados.");
         }
 
         function updateTotalPurchaseCost() {
@@ -558,7 +743,7 @@
             document.getElementById('total-purchase-cost').innerText = `S/. ${totalCost.toFixed(2)}`;
         }
 
-        // REPORTES Y GRÁFICOS (CHART.JS)
+        // REPORTES Y GRÁFICOS
         function initCharts() {
             const ctxBar = document.getElementById('barChart').getContext('2d');
             const ctxLine = document.getElementById('lineChart').getContext('2d');
@@ -593,7 +778,6 @@
         }
 
         function updateCharts(timeframe) {
-            // Estilos de botones
             ['day', 'week', 'month', 'year'].forEach(t => {
                 const btn = document.getElementById(`btn-time-${t}`);
                 if(t === timeframe) {
@@ -603,7 +787,6 @@
                 }
             });
 
-            // Cálculos ficticios/dinámicos filtrando por ventas
             let totalServ = 0;
             let totalProd = 0;
 
@@ -618,7 +801,6 @@
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalServ + totalProd).toFixed(2)}`;
 
-            // Actualizar Gráficos
             barChartInstance.data.datasets[0].data = [totalServ, totalProd];
             barChartInstance.update();
 
@@ -626,7 +808,7 @@
             lineChartInstance.update();
         }
 
-        // PERSISTENCIA DE DATOS
+        // ALMACENAMIENTO LOCAL
         function saveToStorage() {
             localStorage.setItem('chayo_catalog', JSON.stringify(itemsCatalog));
             localStorage.setItem('chayo_sales', JSON.stringify(salesHistory));
@@ -639,7 +821,6 @@
             if(sales) salesHistory = JSON.parse(sales);
         }
 
-        // DESCARGAR/EXPORTAR DATOS PARA TABLET
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(salesHistory, null, 2));
             const downloadAnchor = document.createElement('a');
