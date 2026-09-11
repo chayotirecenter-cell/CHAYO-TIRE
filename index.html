@@ -362,7 +362,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
-                    <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Ventas por Categoria (Barras)</h3>
+                    <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Ventas por Categoría (Barras)</h3>
                     <div class="relative h-64"><canvas id="barChart"></canvas></div>
                 </div>
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
@@ -372,6 +372,78 @@
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
                     <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Tendencia de Ingresos (Líneas)</h3>
                     <div class="relative h-64"><canvas id="lineChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- DETALLE DE VENTAS SEPARADAS POR PUNTOS -->
+            <div class="space-y-6 pt-4">
+                <h3 class="text-xl font-bold border-b pb-2 dark:border-gray-700 flex items-center text-gray-700 dark:text-gray-200">
+                    <i class="fa-solid fa-list-check mr-2 text-chayoRed"></i>Detalle de Ventas Registradas (Sincronizado)
+                </h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- LISTA LLANTAS -->
+                    <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-chayoRed">
+                        <h4 class="font-bold text-base mb-3 text-chayoRed flex justify-between items-center">
+                            <span><i class="fa-solid fa-compact-disc mr-2"></i>Llantas Vendidas</span>
+                        </h4>
+                        <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="text-gray-500 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
+                                    <tr>
+                                        <th class="p-2">Fecha / Hora</th>
+                                        <th class="p-2">Descripción</th>
+                                        <th class="p-2 text-center">Cant.</th>
+                                        <th class="p-2 text-center">Pago</th>
+                                        <th class="p-2 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-tires-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- LISTA SERVICIOS -->
+                    <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-blue-500">
+                        <h4 class="font-bold text-base mb-3 text-blue-600 dark:text-blue-400 flex justify-between items-center">
+                            <span><i class="fa-solid fa-wrench mr-2"></i>Servicios Realizados</span>
+                        </h4>
+                        <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="text-gray-500 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
+                                    <tr>
+                                        <th class="p-2">Fecha / Hora</th>
+                                        <th class="p-2">Servicio</th>
+                                        <th class="p-2 text-center">Cant.</th>
+                                        <th class="p-2 text-center">Pago</th>
+                                        <th class="p-2 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-services-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- LISTA PRODUCTOS -->
+                    <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-yellow-500">
+                        <h4 class="font-bold text-base mb-3 text-yellow-600 dark:text-yellow-400 flex justify-between items-center">
+                            <span><i class="fa-solid fa-box mr-2"></i>Productos / Insumos</span>
+                        </h4>
+                        <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="text-gray-500 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
+                                    <tr>
+                                        <th class="p-2">Fecha / Hora</th>
+                                        <th class="p-2">Producto</th>
+                                        <th class="p-2 text-center">Cant.</th>
+                                        <th class="p-2 text-center">Pago</th>
+                                        <th class="p-2 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-products-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -891,25 +963,52 @@
             let totalTires = 0, totalServ = 0, totalProd = 0;
             let tireCounts = {};
 
+            let tiresSalesList = [];
+            let servicesSalesList = [];
+            let productsSalesList = [];
+
             filteredSales.forEach(s => {
+                const sDate = new Date(s.date);
+                const dateStr = sDate.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
+                const timeStr = sDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
+                const paymentBadge = s.paymentMethod === 'yape' 
+                    ? `<span class="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Yape</span>` 
+                    : `<span class="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Efectivo</span>`;
+
                 s.items.forEach(i => {
                     const amount = i.price * i.qty;
+                    const itemDetail = {
+                        dateTime: `${dateStr} ${timeStr}`,
+                        name: i.name,
+                        qty: i.qty,
+                        paymentBadge,
+                        total: amount
+                    };
+
                     if(i.type === 'llanta') {
                         totalTires += amount;
                         tireCounts[i.name] = (tireCounts[i.name] || 0) + i.qty;
+                        tiresSalesList.push(itemDetail);
                     } else if(i.type === 'servicio') {
                         totalServ += amount;
+                        servicesSalesList.push(itemDetail);
                     } else if(i.type === 'producto') {
                         totalProd += amount;
+                        productsSalesList.push(itemDetail);
                     }
                 });
             });
 
+            // Actualizar tarjetas numéricas
             document.getElementById('report-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
             document.getElementById('report-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
 
+            // Renderizar Tablas de Detalle en Reportes
+            renderReportTables(tiresSalesList, servicesSalesList, productsSalesList);
+
+            // Actualizar Gráficos
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
@@ -959,6 +1058,36 @@
             lineChartInstance.data.labels = lineLabels;
             lineChartInstance.data.datasets[0].data = lineValues;
             lineChartInstance.update();
+        }
+
+        function renderReportTables(tires, services, products) {
+            const tiresTbody = document.getElementById('report-tires-tbody');
+            const servTbody = document.getElementById('report-services-tbody');
+            const prodTbody = document.getElementById('report-products-tbody');
+
+            const fillTable = (tbody, items) => {
+                tbody.innerHTML = "";
+                if(items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">Sin ventas registradas</td></tr>`;
+                    return;
+                }
+                items.forEach(i => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b dark:border-gray-800";
+                    tr.innerHTML = `
+                        <td class="p-2 whitespace-nowrap text-[11px] text-gray-500">${i.dateTime}</td>
+                        <td class="p-2 font-bold">${i.name}</td>
+                        <td class="p-2 text-center font-mono">${i.qty}</td>
+                        <td class="p-2 text-center">${i.paymentBadge}</td>
+                        <td class="p-2 text-right font-bold">S/. ${i.total.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            };
+
+            fillTable(tiresTbody, tires);
+            fillTable(servTbody, services);
+            fillTable(prodTbody, products);
         }
 
         function saveToStorage() {
