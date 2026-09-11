@@ -78,33 +78,28 @@
 
         <!-- ================= PESTAÑA: CAJA ================= -->
         <section id="tab-caja" class="space-y-6">
-            <!-- BARRA DE BÚSQUEDA Y ATAJOS -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
                     <!-- Búsqueda -->
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400 text-lg"></i>
-                        <input type="text" id="search-bar" onkeyup="filterItems()" placeholder="Buscar producto, llanta o servicio (Ej. 185/65, Aceite, Alineación...)" class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-chayoGray shadow-sm focus:ring-2 focus:ring-chayoRed outline-none text-lg">
+                        <input type="text" id="search-bar" onkeyup="filterItems()" placeholder="Buscar producto, llanta o servicio..." class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-chayoGray shadow-sm focus:ring-2 focus:ring-chayoRed outline-none text-lg">
                     </div>
 
                     <!-- Atajos de Productos Más Vendidos -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
                         <h3 class="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 mb-3"><i class="fa-solid fa-fire text-chayoRed mr-1"></i> Atajos - Más Vendidos del Día</h3>
-                        <div id="shortcuts-container" class="flex flex-wrap gap-2">
-                            <!-- Inyectado vía JS -->
-                        </div>
+                        <div id="shortcuts-container" class="flex flex-wrap gap-2"></div>
                     </div>
 
-                    <!-- Catálogo / Lista de Productos y Servicios -->
+                    <!-- Catálogo -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
                         <h3 class="font-bold text-lg mb-3">Catálogo Disponible</h3>
-                        <div id="catalog-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
-                            <!-- Inyectado vía JS -->
-                        </div>
+                        <div id="catalog-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
 
-                <!-- FORMULARIO DE COBRO / BOLETA -->
+                <!-- FORMULARIO DE COBRO -->
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md border-t-4 border-chayoRed flex flex-col justify-between">
                     <div>
                         <h2 class="text-xl font-bold border-b pb-2 dark:border-gray-700 flex justify-between items-center">
@@ -124,7 +119,7 @@
                             </div>
                         </div>
 
-                        <!-- Lista de Ítems en el Carrito -->
+                        <!-- Lista Carrito -->
                         <div class="max-h-48 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
@@ -135,15 +130,12 @@
                                         <th class="p-1 text-center"></th>
                                     </tr>
                                 </thead>
-                                <tbody id="cart-table-body">
-                                    <!-- Inyectado dinámicamente -->
-                                </tbody>
+                                <tbody id="cart-table-body"></tbody>
                             </table>
                         </div>
 
                         <!-- Descuentos y Pagos -->
                         <div class="space-y-3">
-                            <!-- Descuento -->
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm font-medium">Descuento:</span>
                                 <div class="flex space-x-1 w-2/3">
@@ -155,7 +147,6 @@
                                 </div>
                             </div>
 
-                            <!-- Medio de Pago (Botones) -->
                             <div>
                                 <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Medio de Pago</label>
                                 <div class="grid grid-cols-2 gap-2">
@@ -168,7 +159,6 @@
                                 </div>
                             </div>
 
-                            <!-- Cálculo de Vuelto (Si es Efectivo) -->
                             <div id="cash-calculation-box" class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg space-y-2">
                                 <div class="flex justify-between items-center text-sm">
                                     <span>Monto Recibido:</span>
@@ -182,7 +172,6 @@
                         </div>
                     </div>
 
-                    <!-- TOTALES Y BOTÓN FINAL -->
                     <div class="mt-4 border-t pt-3 dark:border-gray-700">
                         <div class="flex justify-between text-lg font-black mb-3">
                             <span>TOTAL A PAGAR:</span>
@@ -199,7 +188,7 @@
 
         <!-- ================= PESTAÑA: ALMACÉN ================= -->
         <section id="tab-almacen" class="hidden space-y-8">
-            <!-- TARJETA SUPERIOR: TOTAL COSTO COMPRA -->
+            <!-- TARJETA SUPERIOR -->
             <div class="bg-gradient-to-r from-red-600 to-chayoRed text-white p-6 rounded-xl shadow-md flex justify-between items-center">
                 <div>
                     <p class="text-sm uppercase font-semibold tracking-wider text-red-100">Inversión Total en Almacén (Llantas + Insumos)</p>
@@ -208,13 +197,13 @@
                 <i class="fa-solid fa-warehouse text-5xl opacity-30"></i>
             </div>
 
-            <!-- REGISTRO DE LLANTAS -->
+            <!-- SECCIÓN LLANTAS -->
             <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4 border-l-4 border-chayoRed">
                 <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed flex items-center">
                     <i class="fa-solid fa-compact-disc mr-2"></i>Añadir o Registrar Llantas
                 </h3>
                 <form id="form-add-tire" onsubmit="addTire(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <input type="text" id="tire-brand" placeholder="Marca / Modelo (Ej. Goodyear Eagle)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <input type="text" id="tire-brand" placeholder="Marca / Modelo (Ej. Goodyear)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <input type="text" id="tire-size" placeholder="Medida (Ej. 185/65 R15)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <div>
                         <label class="text-xs text-gray-500">Costo Compra (S/.)</label>
@@ -229,7 +218,7 @@
                         <input type="number" id="tire-qty" placeholder="1" required class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     </div>
                     <div class="md:col-span-3">
-                        <label class="text-xs text-gray-500">Ganancia Estimada por Llanta (S/.)</label>
+                        <label class="text-xs text-gray-500">Ganancia Est. por Llanta (S/.)</label>
                         <input type="text" id="tire-profit" readonly placeholder="0.00" class="w-full p-2 border rounded bg-gray-100 dark:bg-gray-900 font-bold text-green-600">
                     </div>
                     <div class="md:col-span-2 flex items-end">
@@ -238,15 +227,34 @@
                         </button>
                     </div>
                 </form>
+
+                <!-- TABLA DE LLANTAS REGISTRADAS -->
+                <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                    <h4 class="font-bold text-sm text-gray-600 dark:text-gray-300 mb-2">Inventario de Llantas Registradas</h4>
+                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-gray-500 uppercase bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th class="p-2">Llanta / Modelo</th>
+                                    <th class="p-2">Costo Compra</th>
+                                    <th class="p-2">Precio Venta</th>
+                                    <th class="p-2">Stock</th>
+                                    <th class="p-2 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tire-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- REGISTRO DE PRODUCTOS / INSUMOS -->
-            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4">
-                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed flex items-center">
+            <!-- SECCIÓN PRODUCTOS / INSUMOS -->
+            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4 border-l-4 border-yellow-500">
+                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center">
                     <i class="fa-solid fa-box mr-2"></i>Añadir o Registrar Producto / Insumo
                 </h3>
                 <form id="form-add-product" onsubmit="addProduct(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <input type="text" id="prod-name" placeholder="Nombre del Producto (Ej. Aceite Castrol)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <input type="text" id="prod-name" placeholder="Nombre del Producto" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <div>
                         <label class="text-xs text-gray-500">Costo Compra (S/.)</label>
                         <input type="number" step="0.1" id="prod-buy-cost" placeholder="0.00" onkeyup="calcProductProfit()" required class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
@@ -267,26 +275,62 @@
                         <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Producto</button>
                     </div>
                 </form>
+
+                <!-- TABLA DE PRODUCTOS REGISTRADOS -->
+                <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                    <h4 class="font-bold text-sm text-gray-600 dark:text-gray-300 mb-2">Inventario de Productos / Insumos</h4>
+                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-gray-500 uppercase bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th class="p-2">Producto</th>
+                                    <th class="p-2">Costo Compra</th>
+                                    <th class="p-2">Precio Venta</th>
+                                    <th class="p-2">Stock</th>
+                                    <th class="p-2 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prod-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- REGISTRO DE SERVICIOS -->
-            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4">
-                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-chayoRed flex items-center">
+            <!-- SECCIÓN SERVICIOS -->
+            <div class="bg-white dark:bg-chayoGray p-6 rounded-xl shadow-md space-y-4 border-l-4 border-blue-500">
+                <h3 class="text-lg font-bold border-b pb-2 dark:border-gray-700 text-blue-600 dark:text-blue-400 flex items-center">
                     <i class="fa-solid fa-wrench mr-2"></i>Añadir o Registrar Servicio
                 </h3>
                 <form id="form-add-service" onsubmit="addService(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <input type="text" id="serv-name" placeholder="Servicio (Ej. Enllante, Balanceo)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
-                    <input type="text" id="serv-tire-num" placeholder="N° de Llanta (Ej. N° 15, R16, N/A)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <input type="text" id="serv-tire-num" placeholder="N° de Llanta (Ej. N° 15, R16)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <input type="number" step="0.1" id="serv-cost" placeholder="Costo del Servicio (S/.)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Servicio</button>
                 </form>
+
+                <!-- TABLA DE SERVICIOS REGISTRADOS -->
+                <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                    <h4 class="font-bold text-sm text-gray-600 dark:text-gray-300 mb-2">Catálogo de Servicios</h4>
+                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-gray-500 uppercase bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th class="p-2">Nombre del Servicio</th>
+                                    <th class="p-2">N° Llanta Ref.</th>
+                                    <th class="p-2">Precio Servicio</th>
+                                    <th class="p-2 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="serv-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </section>
 
 
         <!-- ================= PESTAÑA: REPORTES E INGRESOS ================= -->
         <section id="tab-reportes" class="hidden space-y-6">
-            <!-- BOTONES DE FILTRO TEMPORAL -->
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <h2 class="text-2xl font-bold">Reporte de Ingresos</h2>
                 <div class="inline-flex rounded-md shadow-sm" role="group">
@@ -297,7 +341,6 @@
                 </div>
             </div>
 
-            <!-- CUADROS DE TOTALES -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-l-4 border-red-500">
                     <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Llantas Vendidas</p>
@@ -317,39 +360,70 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS (BARRAS, LÍNEAS Y GRAFICA DE LLANTAS) -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
                     <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Ventas por Categoria (Barras)</h3>
-                    <div class="relative h-64">
-                        <canvas id="barChart"></canvas>
-                    </div>
+                    <div class="relative h-64"><canvas id="barChart"></canvas></div>
                 </div>
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
                     <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Distribución de Ventas de Llantas (Dona)</h3>
-                    <div class="relative h-64">
-                        <canvas id="tireChart"></canvas>
-                    </div>
+                    <div class="relative h-64"><canvas id="tireChart"></canvas></div>
                 </div>
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
                     <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Tendencia de Ingresos (Líneas)</h3>
-                    <div class="relative h-64">
-                        <canvas id="lineChart"></canvas>
-                    </div>
+                    <div class="relative h-64"><canvas id="lineChart"></canvas></div>
                 </div>
             </div>
         </section>
 
     </main>
 
+    <!-- MODAL DE EDICIÓN -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-chayoGray p-6 rounded-xl max-w-md w-full shadow-2xl space-y-4">
+            <h3 class="text-xl font-bold border-b pb-2 text-chayoRed"><i class="fa-solid fa-pen-to-square mr-2"></i>Editar Item</h3>
+            <input type="hidden" id="edit-id">
+            <input type="hidden" id="edit-type">
+            
+            <div>
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-400">Nombre / Descripción</label>
+                <input type="text" id="edit-name" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 mt-1">
+            </div>
+
+            <div id="edit-buy-cost-container">
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-400">Costo de Compra (S/.)</label>
+                <input type="number" step="0.1" id="edit-buy-cost" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 mt-1">
+            </div>
+
+            <div>
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-400">Precio de Venta (S/.)</label>
+                <input type="number" step="0.1" id="edit-price" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 mt-1">
+            </div>
+
+            <div id="edit-stock-container">
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-400">Cantidad en Stock</label>
+                <input type="number" id="edit-stock" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 mt-1">
+            </div>
+
+            <div id="edit-tire-num-container">
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-400">N° Llanta Ref.</label>
+                <input type="text" id="edit-tire-num" class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 mt-1">
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-4 border-t dark:border-gray-700">
+                <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded-lg text-sm font-semibold">Cancelar</button>
+                <button onclick="saveEditItem()" class="px-4 py-2 bg-chayoRed text-white rounded-lg text-sm font-semibold hover:bg-red-700">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <!-- LÓGICA JAVASCRIPT -->
     <script>
-        // ESTADO GLOBAL DE LA APLICACIÓN
         let itemsCatalog = [
             { id: 1, type: 'servicio', name: 'Alineación y Balanceo', tireNum: 'R15', price: 50.00, salesCount: 12 },
             { id: 2, type: 'producto', name: 'Aceite de Motor Castrol 20W50', buyCost: 80.00, price: 110.00, stock: 20, salesCount: 25 },
             { id: 3, type: 'servicio', name: 'Parche de Llanta', tireNum: 'N° 16', price: 15.00, salesCount: 40 },
-            { id: 4, type: 'llanta', name: 'Goodyear 185/65 R15', buyCost: 180.00, price: 240.00, stock: 8, salesCount: 18 }
+            { id: 4, type: 'llanta', name: 'Llanta Goodyear 185/65 R15', buyCost: 180.00, price: 240.00, stock: 8, salesCount: 18 }
         ];
 
         let cart = [];
@@ -359,17 +433,16 @@
         let lineChartInstance = null;
         let tireChartInstance = null;
 
-        // INICIALIZACIÓN
         document.addEventListener("DOMContentLoaded", () => {
             loadFromStorage();
             renderCatalog();
             renderShortcuts();
             renderCart();
+            renderInventoryTables();
             updateTotalPurchaseCost();
             initCharts();
         });
 
-        // CAMBIO DE PESTAÑAS
         function switchTab(tabName) {
             ['caja', 'almacen', 'reportes'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -389,12 +462,9 @@
                 document.getElementById(`mob-tab-${tabName}`).classList.remove('text-gray-500');
             }
 
-            if(tabName === 'reportes') {
-                updateCharts('day');
-            }
+            if(tabName === 'reportes') updateCharts('day');
         }
 
-        // MODO NOCHE
         function toggleDarkMode() {
             const html = document.documentElement;
             const icon = document.getElementById('theme-icon');
@@ -407,7 +477,6 @@
             }
         }
 
-        // SELECCIÓN MEDIO DE PAGO
         function selectPayment(method) {
             selectedPaymentMethod = method;
             const btnEf = document.getElementById('pay-efectivo');
@@ -425,11 +494,9 @@
             }
         }
 
-        // RENDERIZAR CATALOGO
         function renderCatalog(filter = "") {
             const container = document.getElementById('catalog-list');
             container.innerHTML = "";
-
             const filtered = itemsCatalog.filter(i => i.name.toLowerCase().includes(filter.toLowerCase()));
 
             filtered.forEach(item => {
@@ -437,10 +504,7 @@
                 card.className = "p-3 border rounded-lg dark:border-gray-700 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition";
                 card.onclick = () => addToCart(item.id);
                 
-                let detailText = "";
-                if(item.type === 'servicio') detailText = 'Servicio (Llanta: ' + item.tireNum + ')';
-                else if(item.type === 'llanta') detailText = 'Llanta (Stock: ' + item.stock + ')';
-                else detailText = 'Producto (Stock: ' + item.stock + ')';
+                let detailText = item.type === 'servicio' ? `Servicio (${item.tireNum})` : `Stock: ${item.stock}`;
 
                 card.innerHTML = `
                     <div>
@@ -455,11 +519,9 @@
         }
 
         function filterItems() {
-            const query = document.getElementById('search-bar').value;
-            renderCatalog(query);
+            renderCatalog(document.getElementById('search-bar').value);
         }
 
-        // ATAJOS
         function renderShortcuts() {
             const container = document.getElementById('shortcuts-container');
             container.innerHTML = "";
@@ -474,15 +536,11 @@
             });
         }
 
-        // CARRITO DE COMPRAS
         function addToCart(id) {
             const item = itemsCatalog.find(i => i.id === id);
             const inCart = cart.find(c => c.id === id);
-            if(inCart) {
-                inCart.qty++;
-            } else {
-                cart.push({ ...item, qty: 1 });
-            }
+            if(inCart) inCart.qty++;
+            else cart.push({ ...item, qty: 1 });
             renderCart();
         }
 
@@ -515,17 +573,10 @@
             let discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
             let discountType = document.getElementById('discount-type').value;
 
-            let discount = 0;
-            if(discountType === 'soles') {
-                discount = discountVal;
-            } else {
-                discount = (subtotal * discountVal) / 100;
-            }
-
+            let discount = discountType === 'soles' ? discountVal : (subtotal * discountVal) / 100;
             let total = Math.max(0, subtotal - discount);
             document.getElementById('cart-total-text').innerText = `S/. ${total.toFixed(2)}`;
 
-            // Cálculo Vuelto
             let paid = parseFloat(document.getElementById('amount-paid').value) || 0;
             let change = paid - total;
             document.getElementById('change-amount').innerText = `S/. ${change > 0 ? change.toFixed(2) : '0.00'}`;
@@ -533,7 +584,6 @@
             return total;
         }
 
-        // PROCESAR VENTA
         function processSale() {
             if(cart.length === 0) return alert("Añade al menos un producto o servicio al carrito.");
 
@@ -553,7 +603,6 @@
 
             salesHistory.push(sale);
             
-            // Aumentar contador para productos más vendidos y descontar stock
             cart.forEach(cItem => {
                 let catItem = itemsCatalog.find(i => i.id === cItem.id);
                 if(catItem) {
@@ -574,10 +623,130 @@
             renderCart();
             renderCatalog();
             renderShortcuts();
+            renderInventoryTables();
             updateTotalPurchaseCost();
         }
 
-        // ALMACÉN Y FORMULARIOS
+        /* --- RENDERING TABLAS DE INVENTARIO EN ALMACÉN --- */
+        function renderInventoryTables() {
+            const tireTbody = document.getElementById('tire-table-body');
+            const prodTbody = document.getElementById('prod-table-body');
+            const servTbody = document.getElementById('serv-table-body');
+
+            tireTbody.innerHTML = "";
+            prodTbody.innerHTML = "";
+            servTbody.innerHTML = "";
+
+            itemsCatalog.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800";
+
+                if (item.type === 'llanta') {
+                    tr.innerHTML = `
+                        <td class="p-2 font-bold">${item.name}</td>
+                        <td class="p-2">S/. ${(item.buyCost || 0).toFixed(2)}</td>
+                        <td class="p-2 font-bold text-chayoRed">S/. ${item.price.toFixed(2)}</td>
+                        <td class="p-2"><span class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-xs">${item.stock}</span></td>
+                        <td class="p-2 text-center space-x-2">
+                            <button onclick="openEditModal(${item.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    tireTbody.appendChild(tr);
+                } else if (item.type === 'producto') {
+                    tr.innerHTML = `
+                        <td class="p-2 font-bold">${item.name}</td>
+                        <td class="p-2">S/. ${(item.buyCost || 0).toFixed(2)}</td>
+                        <td class="p-2 font-bold text-yellow-600">S/. ${item.price.toFixed(2)}</td>
+                        <td class="p-2"><span class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-xs">${item.stock}</span></td>
+                        <td class="p-2 text-center space-x-2">
+                            <button onclick="openEditModal(${item.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    prodTbody.appendChild(tr);
+                } else if (item.type === 'servicio') {
+                    tr.innerHTML = `
+                        <td class="p-2 font-bold">${item.name}</td>
+                        <td class="p-2">${item.tireNum || 'N/A'}</td>
+                        <td class="p-2 font-bold text-blue-600">S/. ${item.price.toFixed(2)}</td>
+                        <td class="p-2 text-center space-x-2">
+                            <button onclick="openEditModal(${item.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    servTbody.appendChild(tr);
+                }
+            });
+        }
+
+        /* --- MODAL EDICIÓN DE ÍTEMS --- */
+        function openEditModal(id) {
+            const item = itemsCatalog.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('edit-type').value = item.type;
+            document.getElementById('edit-name').value = item.name;
+            document.getElementById('edit-price').value = item.price;
+
+            const buyContainer = document.getElementById('edit-buy-cost-container');
+            const stockContainer = document.getElementById('edit-stock-container');
+            const tireNumContainer = document.getElementById('edit-tire-num-container');
+
+            if (item.type === 'servicio') {
+                buyContainer.classList.add('hidden');
+                stockContainer.classList.add('hidden');
+                tireNumContainer.classList.remove('hidden');
+                document.getElementById('edit-tire-num').value = item.tireNum || '';
+            } else {
+                buyContainer.classList.remove('hidden');
+                stockContainer.classList.remove('hidden');
+                tireNumContainer.classList.add('hidden');
+                document.getElementById('edit-buy-cost').value = item.buyCost || 0;
+                document.getElementById('edit-stock').value = item.stock || 0;
+            }
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function saveEditItem() {
+            const id = parseInt(document.getElementById('edit-id').value);
+            const item = itemsCatalog.find(i => i.id === id);
+            if (!item) return;
+
+            item.name = document.getElementById('edit-name').value;
+            item.price = parseFloat(document.getElementById('edit-price').value) || 0;
+
+            if (item.type === 'servicio') {
+                item.tireNum = document.getElementById('edit-tire-num').value;
+            } else {
+                item.buyCost = parseFloat(document.getElementById('edit-buy-cost').value) || 0;
+                item.stock = parseInt(document.getElementById('edit-stock').value) || 0;
+            }
+
+            saveToStorage();
+            renderCatalog();
+            renderInventoryTables();
+            updateTotalPurchaseCost();
+            closeEditModal();
+        }
+
+        function deleteItem(id) {
+            if (confirm("¿Estás seguro de que deseas eliminar este ítem?")) {
+                itemsCatalog = itemsCatalog.filter(i => i.id !== id);
+                saveToStorage();
+                renderCatalog();
+                renderInventoryTables();
+                updateTotalPurchaseCost();
+            }
+        }
+
+        /* --- AGREGAR ÍTEMS --- */
         function calcTireProfit() {
             let buy = parseFloat(document.getElementById('tire-buy-cost').value) || 0;
             let sell = parseFloat(document.getElementById('tire-sell-price').value) || 0;
@@ -606,10 +775,10 @@
             itemsCatalog.push(newTire);
             saveToStorage();
             renderCatalog();
+            renderInventoryTables();
             updateTotalPurchaseCost();
             e.target.reset();
             document.getElementById('tire-profit').value = "0.00";
-            alert("Llanta añadida al almacén.");
         }
 
         function addProduct(e) {
@@ -626,10 +795,10 @@
             itemsCatalog.push(newProd);
             saveToStorage();
             renderCatalog();
+            renderInventoryTables();
             updateTotalPurchaseCost();
             e.target.reset();
             document.getElementById('prod-profit').value = "0.00";
-            alert("Producto añadido al almacén.");
         }
 
         function addService(e) {
@@ -645,8 +814,8 @@
             itemsCatalog.push(newServ);
             saveToStorage();
             renderCatalog();
+            renderInventoryTables();
             e.target.reset();
-            alert("Servicio añadido al catálogo.");
         }
 
         function updateTotalPurchaseCost() {
@@ -656,7 +825,7 @@
             document.getElementById('total-purchase-cost').innerText = `S/. ${totalCost.toFixed(2)}`;
         }
 
-        // REPORTES Y GRÁFICOS (CHART.JS)
+        /* --- REPORTES --- */
         function initCharts() {
             const ctxBar = document.getElementById('barChart').getContext('2d');
             const ctxLine = document.getElementById('lineChart').getContext('2d');
@@ -666,11 +835,7 @@
                 type: 'bar',
                 data: {
                     labels: ['Llantas', 'Servicios', 'Productos'],
-                    datasets: [{
-                        label: 'Ingresos (S/.)',
-                        data: [0, 0, 0],
-                        backgroundColor: ['#D32F2F', '#3B82F6', '#EAB308']
-                    }]
+                    datasets: [{ label: 'Ingresos (S/.)', data: [0, 0, 0], backgroundColor: ['#D32F2F', '#3B82F6', '#EAB308'] }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -679,11 +844,7 @@
                 type: 'doughnut',
                 data: {
                     labels: ['R13', 'R14', 'R15', 'R16', 'R17+'],
-                    datasets: [{
-                        label: 'Unidades Vendidas',
-                        data: [5, 12, 25, 18, 8],
-                        backgroundColor: ['#EF4444', '#F97316', '#FACC15', '#10B981', '#3B82F6']
-                    }]
+                    datasets: [{ label: 'Unidades Vendidas', data: [5, 12, 25, 18, 8], backgroundColor: ['#EF4444', '#F97316', '#FACC15', '#10B981', '#3B82F6'] }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -692,32 +853,19 @@
                 type: 'line',
                 data: {
                     labels: ['P1', 'P2', 'P3', 'P4'],
-                    datasets: [{
-                        label: 'Ingresos Totales',
-                        data: [0, 0, 0, 0],
-                        borderColor: '#D32F2F',
-                        tension: 0.3,
-                        fill: false
-                    }]
+                    datasets: [{ label: 'Ingresos Totales', data: [0, 0, 0, 0], borderColor: '#D32F2F', tension: 0.3, fill: false }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
         function updateCharts(timeframe) {
-            // Estilos de botones
             ['day', 'week', 'month', 'year'].forEach(t => {
                 const btn = document.getElementById(`btn-time-${t}`);
-                if(t === timeframe) {
-                    btn.className = "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-chayoRed text-white";
-                } else {
-                    btn.className = "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800";
-                }
+                btn.className = (t === timeframe) ? "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-chayoRed text-white" : "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800";
             });
 
-            let totalTires = 0;
-            let totalServ = 0;
-            let totalProd = 0;
+            let totalTires = 0, totalServ = 0, totalProd = 0;
 
             salesHistory.forEach(s => {
                 s.items.forEach(i => {
@@ -732,7 +880,6 @@
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
 
-            // Actualizar Gráficos
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
@@ -741,7 +888,6 @@
             lineChartInstance.update();
         }
 
-        // PERSISTENCIA DE DATOS
         function saveToStorage() {
             localStorage.setItem('chayo_catalog', JSON.stringify(itemsCatalog));
             localStorage.setItem('chayo_sales', JSON.stringify(salesHistory));
@@ -754,7 +900,6 @@
             if(sales) salesHistory = JSON.parse(sales);
         }
 
-        // DESCARGAR/EXPORTAR DATOS PARA TABLET
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(salesHistory, null, 2));
             const downloadAnchor = document.createElement('a');
