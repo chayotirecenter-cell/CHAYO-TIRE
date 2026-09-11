@@ -843,8 +843,8 @@
             tireChartInstance = new Chart(ctxTire, {
                 type: 'doughnut',
                 data: {
-                    labels: ['R13', 'R14', 'R15', 'R16', 'R17+'],
-                    datasets: [{ label: 'Unidades Vendidas', data: [5, 12, 25, 18, 8], backgroundColor: ['#EF4444', '#F97316', '#FACC15', '#10B981', '#3B82F6'] }]
+                    labels: [],
+                    datasets: [{ label: 'Unidades Vendidas', data: [], backgroundColor: ['#EF4444', '#F97316', '#FACC15', '#10B981', '#3B82F6', '#8B5CF6'] }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -852,8 +852,8 @@
             lineChartInstance = new Chart(ctxLine, {
                 type: 'line',
                 data: {
-                    labels: ['P1', 'P2', 'P3', 'P4'],
-                    datasets: [{ label: 'Ingresos Totales', data: [0, 0, 0, 0], borderColor: '#D32F2F', tension: 0.3, fill: false }]
+                    labels: [],
+                    datasets: [{ label: 'Ingresos Totales (S/.)', data: [], borderColor: '#D32F2F', backgroundColor: 'rgba(211, 47, 47, 0.1)', fill: true, tension: 0.3 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -862,16 +862,46 @@
         function updateCharts(timeframe) {
             ['day', 'week', 'month', 'year'].forEach(t => {
                 const btn = document.getElementById(`btn-time-${t}`);
-                btn.className = (t === timeframe) ? "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-chayoRed text-white" : "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800";
+                if(btn) {
+                    btn.className = (t === timeframe) 
+                        ? "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-chayoRed text-white" 
+                        : "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800";
+                }
+            });
+
+            const now = new Date();
+            
+            const filteredSales = salesHistory.filter(sale => {
+                const saleDate = new Date(sale.date);
+                if (timeframe === 'day') {
+                    return saleDate.toDateString() === now.toDateString();
+                } else if (timeframe === 'week') {
+                    const startOfWeek = new Date(now);
+                    startOfWeek.setDate(now.getDate() - now.getDay());
+                    startOfWeek.setHours(0,0,0,0);
+                    return saleDate >= startOfWeek;
+                } else if (timeframe === 'month') {
+                    return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear();
+                } else if (timeframe === 'year') {
+                    return saleDate.getFullYear() === now.getFullYear();
+                }
+                return true;
             });
 
             let totalTires = 0, totalServ = 0, totalProd = 0;
+            let tireCounts = {};
 
-            salesHistory.forEach(s => {
+            filteredSales.forEach(s => {
                 s.items.forEach(i => {
-                    if(i.type === 'llanta') totalTires += (i.price * i.qty);
-                    if(i.type === 'servicio') totalServ += (i.price * i.qty);
-                    if(i.type === 'producto') totalProd += (i.price * i.qty);
+                    const amount = i.price * i.qty;
+                    if(i.type === 'llanta') {
+                        totalTires += amount;
+                        tireCounts[i.name] = (tireCounts[i.name] || 0) + i.qty;
+                    } else if(i.type === 'servicio') {
+                        totalServ += amount;
+                    } else if(i.type === 'producto') {
+                        totalProd += amount;
+                    }
                 });
             });
 
@@ -883,8 +913,51 @@
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
-            let total = totalTires + totalServ + totalProd;
-            lineChartInstance.data.datasets[0].data = [total * 0.15, total * 0.35, total * 0.65, total];
+            const tireLabels = Object.keys(tireCounts);
+            const tireData = Object.values(tireCounts);
+            tireChartInstance.data.labels = tireLabels.length ? tireLabels : ['Sin Ventas'];
+            tireChartInstance.data.datasets[0].data = tireData.length ? tireData : [0];
+            tireChartInstance.update();
+
+            let lineLabels = [];
+            let lineValues = [];
+
+            if (timeframe === 'day') {
+                lineLabels = ['8am', '10am', '12pm', '2pm', '4pm', '6pm', '8pm'];
+                lineValues = new Array(7).fill(0);
+                filteredSales.forEach(s => {
+                    const hour = new Date(s.date).getHours();
+                    if (hour >= 8 && hour <= 20) {
+                        const idx = Math.min(Math.floor((hour - 8) / 2), 6);
+                        lineValues[idx] += s.total;
+                    }
+                });
+            } else if (timeframe === 'week') {
+                lineLabels = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                lineValues = new Array(7).fill(0);
+                filteredSales.forEach(s => {
+                    const dayIdx = new Date(s.date).getDay();
+                    lineValues[dayIdx] += s.total;
+                });
+            } else if (timeframe === 'month') {
+                lineLabels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+                lineValues = new Array(4).fill(0);
+                filteredSales.forEach(s => {
+                    const dayOfMonth = new Date(s.date).getDate();
+                    const weekIdx = Math.min(Math.floor((dayOfMonth - 1) / 7), 3);
+                    lineValues[weekIdx] += s.total;
+                });
+            } else if (timeframe === 'year') {
+                lineLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                lineValues = new Array(12).fill(0);
+                filteredSales.forEach(s => {
+                    const monthIdx = new Date(s.date).getMonth();
+                    lineValues[monthIdx] += s.total;
+                });
+            }
+
+            lineChartInstance.data.labels = lineLabels;
+            lineChartInstance.data.datasets[0].data = lineValues;
             lineChartInstance.update();
         }
 
