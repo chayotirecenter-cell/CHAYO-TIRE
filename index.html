@@ -31,6 +31,15 @@
             color: #D32F2F;
             font-weight: bold;
         }
+        /* Ocultar botones de incremento/decremento en inputs numéricos */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-chayoDark dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col font-sans">
@@ -139,7 +148,7 @@
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm font-medium">Descuento:</span>
                                 <div class="flex space-x-1 w-2/3">
-                                    <input type="number" id="discount-val" value="0" min="0" onchange="calculateTotals()" onkeyup="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-right text-sm">
+                                    <input type="number" id="discount-val" placeholder="0" min="0" onchange="calculateTotals()" onkeyup="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-right text-sm">
                                     <select id="discount-type" onchange="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
                                         <option value="soles">S/.</option>
                                         <option value="percent">%</option>
@@ -162,7 +171,7 @@
                             <div id="cash-calculation-box" class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg space-y-2">
                                 <div class="flex justify-between items-center text-sm">
                                     <span>Monto Recibido:</span>
-                                    <input type="number" id="amount-paid" placeholder="0.00" onkeyup="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-700 dark:border-gray-600 text-sm">
+                                    <input type="number" id="amount-paid" placeholder="0.00" min="0" onkeyup="calculateTotals()" onchange="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-700 dark:border-gray-600 text-sm">
                                 </div>
                                 <div class="flex justify-between items-center font-bold text-sm">
                                     <span>Vuelto a Devolver:</span>
@@ -689,7 +698,6 @@
             const client = document.getElementById('cart-client').value || "Cliente Varios";
             const plate = document.getElementById('cart-plate').value || "S/P";
 
-            // Calcular el factor de descuento proporcional para distribuirlo entre los items
             const discountFactor = subtotal > 0 ? (total / subtotal) : 1;
 
             const finalCartItems = cart.map(i => ({
@@ -725,7 +733,7 @@
             document.getElementById('cart-client').value = "";
             document.getElementById('cart-plate').value = "";
             document.getElementById('amount-paid').value = "";
-            document.getElementById('discount-val').value = "0";
+            document.getElementById('discount-val').value = "";
             renderCart();
             renderCatalog();
             renderShortcuts();
@@ -970,7 +978,6 @@
             const badge = document.getElementById('low-stock-count-badge');
             tbody.innerHTML = "";
 
-            // Filtrar Llantas y Productos con Stock <= 3
             const lowStockItems = itemsCatalog.filter(i => (i.type === 'llanta' || i.type === 'producto') && i.stock <= 3);
 
             badge.innerText = `${lowStockItems.length} ítem(s)`;
@@ -1067,19 +1074,14 @@
                 });
             });
 
-            // Actualizar tarjetas numéricas
             document.getElementById('report-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
             document.getElementById('report-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
 
-            // Renderizar Lista Grupal de Stock Bajo
             renderLowStockAlert();
-
-            // Renderizar Tablas de Detalle en Reportes
             renderReportTables(tiresSalesList, servicesSalesList, productsSalesList);
 
-            // Actualizar Gráficos
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
