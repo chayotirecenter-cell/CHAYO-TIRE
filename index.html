@@ -684,16 +684,25 @@
         function processSale() {
             if(cart.length === 0) return alert("Añade al menos un producto o servicio al carrito.");
 
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
             const total = calculateTotals();
             const client = document.getElementById('cart-client').value || "Cliente Varios";
             const plate = document.getElementById('cart-plate').value || "S/P";
+
+            // Calcular el factor de descuento proporcional para distribuirlo entre los items
+            const discountFactor = subtotal > 0 ? (total / subtotal) : 1;
+
+            const finalCartItems = cart.map(i => ({
+                ...i,
+                price: i.price * discountFactor
+            }));
 
             const sale = {
                 id: Date.now(),
                 date: new Date().toISOString(),
                 client,
                 plate,
-                items: [...cart],
+                items: finalCartItems,
                 paymentMethod: selectedPaymentMethod,
                 total
             };
@@ -712,11 +721,11 @@
 
             saveToStorage();
 
-            // MENSAJE DE ÉXITO REMOVIDO A PETICIÓN
             cart = [];
             document.getElementById('cart-client').value = "";
             document.getElementById('cart-plate').value = "";
             document.getElementById('amount-paid').value = "";
+            document.getElementById('discount-val').value = "0";
             renderCart();
             renderCatalog();
             renderShortcuts();
