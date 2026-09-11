@@ -341,6 +341,31 @@
                 </div>
             </div>
 
+            <!-- ALERTA STOCK BAJO (GRUPAL LLANTAS Y PRODUCTOS <= 3) -->
+            <div id="low-stock-alert-container" class="bg-red-50 dark:bg-red-950/40 border-2 border-red-500 rounded-xl p-4 shadow-md transition-all">
+                <div class="flex items-center justify-between border-b border-red-200 dark:border-red-800 pb-2 mb-3">
+                    <h3 class="text-red-600 dark:text-red-400 font-black text-base flex items-center uppercase tracking-wide">
+                        <i class="fa-solid fa-triangle-exclamation animate-bounce text-xl mr-2"></i>
+                        Alerta de Stock Crítico (3 Unidades o Menos)
+                    </h3>
+                    <span id="low-stock-count-badge" class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">0 ítems</span>
+                </div>
+                <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="text-red-800 dark:text-red-200 uppercase bg-red-100 dark:bg-red-900/60 sticky top-0">
+                            <tr>
+                                <th class="p-2">Categoría</th>
+                                <th class="p-2">Ítem / Descripción</th>
+                                <th class="p-2 text-center">Precio Venta</th>
+                                <th class="p-2 text-center">Stock Actual</th>
+                                <th class="p-2 text-right">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-stock-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-l-4 border-red-500">
                     <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Llantas Vendidas</p>
@@ -495,7 +520,7 @@
             { id: 1, type: 'servicio', name: 'Alineación y Balanceo', tireNum: 'R15', price: 50.00, salesCount: 12 },
             { id: 2, type: 'producto', name: 'Aceite de Motor Castrol 20W50', buyCost: 80.00, price: 110.00, stock: 20, salesCount: 25 },
             { id: 3, type: 'servicio', name: 'Parche de Llanta', tireNum: 'N° 16', price: 15.00, salesCount: 40 },
-            { id: 4, type: 'llanta', name: 'Llanta Goodyear 185/65 R15', buyCost: 180.00, price: 240.00, stock: 8, salesCount: 18 }
+            { id: 4, type: 'llanta', name: 'Llanta Goodyear 185/65 R15', buyCost: 180.00, price: 240.00, stock: 2, salesCount: 18 }
         ];
 
         let cart = [];
@@ -687,7 +712,7 @@
 
             saveToStorage();
 
-            alert("✅ Venta registrada correctamente");
+            // MENSAJE DE ÉXITO REMOVIDO A PETICIÓN
             cart = [];
             document.getElementById('cart-client').value = "";
             document.getElementById('cart-plate').value = "";
@@ -718,7 +743,7 @@
                         <td class="p-2 font-bold">${item.name}</td>
                         <td class="p-2">S/. ${(item.buyCost || 0).toFixed(2)}</td>
                         <td class="p-2 font-bold text-chayoRed">S/. ${item.price.toFixed(2)}</td>
-                        <td class="p-2"><span class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-xs">${item.stock}</span></td>
+                        <td class="p-2"><span class="px-2 py-1 ${item.stock <= 3 ? 'bg-red-500 text-white font-bold' : 'bg-gray-200 dark:bg-gray-700'} rounded font-mono text-xs">${item.stock}</span></td>
                         <td class="p-2 text-center space-x-2">
                             <button onclick="openEditModal(${item.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
@@ -730,7 +755,7 @@
                         <td class="p-2 font-bold">${item.name}</td>
                         <td class="p-2">S/. ${(item.buyCost || 0).toFixed(2)}</td>
                         <td class="p-2 font-bold text-yellow-600">S/. ${item.price.toFixed(2)}</td>
-                        <td class="p-2"><span class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-xs">${item.stock}</span></td>
+                        <td class="p-2"><span class="px-2 py-1 ${item.stock <= 3 ? 'bg-red-500 text-white font-bold' : 'bg-gray-200 dark:bg-gray-700'} rounded font-mono text-xs">${item.stock}</span></td>
                         <td class="p-2 text-center space-x-2">
                             <button onclick="openEditModal(${item.id})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
@@ -931,6 +956,40 @@
             });
         }
 
+        function renderLowStockAlert() {
+            const tbody = document.getElementById('low-stock-tbody');
+            const badge = document.getElementById('low-stock-count-badge');
+            tbody.innerHTML = "";
+
+            // Filtrar Llantas y Productos con Stock <= 3
+            const lowStockItems = itemsCatalog.filter(i => (i.type === 'llanta' || i.type === 'producto') && i.stock <= 3);
+
+            badge.innerText = `${lowStockItems.length} ítem(s)`;
+
+            if (lowStockItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-green-600 dark:text-green-400 font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> Todo el inventario de llantas y productos tiene stock suficiente (más de 3 unidades).</td></tr>`;
+                return;
+            }
+
+            lowStockItems.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-red-200 dark:border-red-900 bg-red-100/70 dark:bg-red-900/30 hover:bg-red-200/80 font-semibold";
+
+                const categoryBadge = item.type === 'llanta' 
+                    ? `<span class="bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100 px-2 py-0.5 rounded text-[10px] uppercase font-bold"><i class="fa-solid fa-compact-disc mr-1"></i>Llanta</span>`
+                    : `<span class="bg-yellow-200 text-yellow-900 dark:bg-yellow-800 dark:text-yellow-100 px-2 py-0.5 rounded text-[10px] uppercase font-bold"><i class="fa-solid fa-box mr-1"></i>Producto</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-2">${categoryBadge}</td>
+                    <td class="p-2 font-bold text-red-900 dark:text-red-100">${item.name}</td>
+                    <td class="p-2 text-center font-bold">S/. ${item.price.toFixed(2)}</td>
+                    <td class="p-2 text-center"><span class="bg-red-600 text-white font-black px-2 py-1 rounded-md animate-pulse">${item.stock} un.</span></td>
+                    <td class="p-2 text-right"><span class="text-red-700 dark:text-red-300 uppercase text-[10px] font-black"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Reabastecer urgente</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         function updateCharts(timeframe) {
             ['day', 'week', 'month', 'year'].forEach(t => {
                 const btn = document.getElementById(`btn-time-${t}`);
@@ -1004,6 +1063,9 @@
             document.getElementById('report-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
+
+            // Renderizar Lista Grupal de Stock Bajo
+            renderLowStockAlert();
 
             // Renderizar Tablas de Detalle en Reportes
             renderReportTables(tiresSalesList, servicesSalesList, productsSalesList);
