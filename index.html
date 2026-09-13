@@ -105,7 +105,7 @@
 
                     <!-- Atajos de Productos Más Vendidos -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-sm">
-                        <h3 class="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 mb-3"><i class="fa-solid fa-fire text-chayoRed mr-1"></i> Atajos - Más Vendidos del Día</h3>
+                        <h3 class="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 mb-3"><i class="fa-solid fa-fire text-chayoRed mr-1"></i> Atajos - Más Vendidos</h3>
                         <div id="shortcuts-container" class="flex flex-wrap gap-2"></div>
                     </div>
 
@@ -136,7 +136,7 @@
                             </div>
                         </div>
 
-                        <!-- Lista Carrito Con Controles de Incremento / Decremento -->
+                        <!-- Lista Carrito -->
                         <div class="max-h-48 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
@@ -370,7 +370,7 @@
             <div class="flex justify-between items-center flex-wrap gap-3 bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md">
                 <div>
                     <h2 class="text-2xl font-bold">Reporte de Ingresos del Local</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Selecciona el período para calcular el total generado al finalizar tus labores.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Selecciona el período para calcular el total generado en tus labores.</p>
                 </div>
                 <div class="inline-flex rounded-lg shadow-sm" role="group">
                     <button onclick="updateCharts('day')" id="btn-time-day" class="px-4 py-2 text-sm font-bold border border-gray-300 dark:border-gray-700 rounded-l-lg bg-chayoRed text-white">Día</button>
@@ -440,10 +440,10 @@
                 </div>
             </div>
 
-            <!-- DETALLE DE VENTAS CON TOTALES EN LA ESQUINA SUPERIOR DERECHA DE CADA LISTA -->
+            <!-- DETALLE DE VENTAS CON TOTALES EN LA ESQUINA SUPERIOR DERECHA -->
             <div class="space-y-6 pt-4">
                 <h3 class="text-xl font-bold border-b pb-2 dark:border-gray-700 flex items-center text-gray-700 dark:text-gray-200">
-                    <i class="fa-solid fa-list-check mr-2 text-chayoRed"></i>Detalle de Ingresos por Categoria
+                    <i class="fa-solid fa-list-check mr-2 text-chayoRed"></i>Detalle de Ingresos por Categoría
                 </h3>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -453,7 +453,6 @@
                             <h4 class="font-bold text-base text-chayoRed flex items-center">
                                 <i class="fa-solid fa-compact-disc mr-2"></i>Llantas Vendidas
                             </h4>
-                            <!-- TOTAL EN LA ESQUINA SUPERIOR DERECHA DE LA LISTA -->
                             <div class="text-right bg-red-50 dark:bg-red-950 px-2 py-1 rounded-lg border border-red-200 dark:border-red-800">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold">Total Llantas</p>
                                 <span id="list-total-tires" class="text-sm font-black text-chayoRed">S/. 0.00</span>
@@ -481,7 +480,6 @@
                             <h4 class="font-bold text-base text-blue-600 dark:text-blue-400 flex items-center">
                                 <i class="fa-solid fa-wrench mr-2"></i>Servicios Realizados
                             </h4>
-                            <!-- TOTAL EN LA ESQUINA SUPERIOR DERECHA DE LA LISTA -->
                             <div class="text-right bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold">Total Servicios</p>
                                 <span id="list-total-services" class="text-sm font-black text-blue-600 dark:text-blue-400">S/. 0.00</span>
@@ -509,7 +507,6 @@
                             <h4 class="font-bold text-base text-yellow-600 dark:text-yellow-400 flex items-center">
                                 <i class="fa-solid fa-box mr-2"></i>Productos y Insumos
                             </h4>
-                            <!-- TOTAL EN LA ESQUINA SUPERIOR DERECHA DE LA LISTA -->
                             <div class="text-right bg-yellow-50 dark:bg-yellow-950 px-2 py-1 rounded-lg border border-yellow-200 dark:border-yellow-800">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold">Total Productos</p>
                                 <span id="list-total-products" class="text-sm font-black text-yellow-600 dark:text-yellow-400">S/. 0.00</span>
@@ -667,7 +664,7 @@
 
         let cart = [];
         let salesHistory = [];
-        let selectedPaymentMethod = 'efectivo'; // 'efectivo', 'yape', 'mixto'
+        let selectedPaymentMethod = 'efectivo';
         let barChartInstance = null;
         let lineChartInstance = null;
         let tireChartInstance = null;
@@ -716,7 +713,6 @@
             }
         }
 
-        /* --- MEDIOS DE PAGO (EFECTIVO, YAPE Y MIXTO) --- */
         function selectPayment(method) {
             selectedPaymentMethod = method;
             const btnEf = document.getElementById('pay-efectivo');
@@ -726,7 +722,6 @@
             const cashBox = document.getElementById('cash-calculation-box');
             const mixedBox = document.getElementById('mixed-payment-box');
 
-            // Resetear estilos
             [btnEf, btnYape, btnMixto].forEach(b => {
                 b.className = "py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-xs flex items-center justify-center";
             });
@@ -808,7 +803,6 @@
             renderCart();
         }
 
-        /* --- CONTROL DE DISMINUIR E INCREMENTAR EN CAJA --- */
         function decreaseCartItem(index) {
             if (cart[index].qty > 1) {
                 cart[index].qty--;
@@ -971,7 +965,6 @@
             alert("¡Venta completada con éxito!");
         }
 
-        /* --- RENDERING TABLAS DE INVENTARIO EN ALMACÉN --- */
         function renderInventoryTables() {
             const tireTbody = document.getElementById('tire-table-body');
             const prodTbody = document.getElementById('prod-table-body');
@@ -1024,7 +1017,6 @@
             });
         }
 
-        /* --- MODAL EDICIÓN --- */
         function openEditModal(id) {
             const item = itemsCatalog.find(i => i.id === id);
             if (!item) return;
@@ -1090,7 +1082,6 @@
             }
         }
 
-        /* --- AGREGAR ÍTEMS --- */
         function calcTireProfit() {
             let buy = parseFloat(document.getElementById('tire-buy-cost').value) || 0;
             let sell = parseFloat(document.getElementById('tire-sell-price').value) || 0;
@@ -1169,7 +1160,6 @@
             document.getElementById('total-purchase-cost').innerText = `S/. ${totalCost.toFixed(2)}`;
         }
 
-        /* --- REPORTES CON GRÁFICOS Y LISTAS FILTRADAS POR PERÍODOS --- */
         function initCharts() {
             const ctxBar = document.getElementById('barChart').getContext('2d');
             const ctxLine = document.getElementById('lineChart').getContext('2d');
@@ -1236,6 +1226,7 @@
             });
         }
 
+        /* --- CORRECCIÓN EN EL FILTRADO POR PERÍODOS --- */
         function updateCharts(timeframe) {
             ['day', 'week', 'month', 'year'].forEach(t => {
                 const btn = document.getElementById(`btn-time-${t}`);
@@ -1248,21 +1239,26 @@
 
             const now = new Date();
             
+            // Establecer límites de inicio según el período seleccionado
+            let startTime = new Date();
+
+            if (timeframe === 'day') {
+                startTime.setHours(0, 0, 0, 0);
+            } else if (timeframe === 'week') {
+                // Obtener el Lunes de la semana actual
+                const dayOfWeek = now.getDay();
+                const distanceToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Trata al Lunes como día 1
+                startTime.setDate(now.getDate() - distanceToMonday);
+                startTime.setHours(0, 0, 0, 0);
+            } else if (timeframe === 'month') {
+                startTime = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+            } else if (timeframe === 'year') {
+                startTime = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+            }
+
             const filteredSales = salesHistory.filter(sale => {
                 const saleDate = new Date(sale.date);
-                if (timeframe === 'day') {
-                    return saleDate.toDateString() === now.toDateString();
-                } else if (timeframe === 'week') {
-                    const startOfWeek = new Date(now);
-                    startOfWeek.setDate(now.getDate() - now.getDay());
-                    startOfWeek.setHours(0,0,0,0);
-                    return saleDate >= startOfWeek;
-                } else if (timeframe === 'month') {
-                    return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear();
-                } else if (timeframe === 'year') {
-                    return saleDate.getFullYear() === now.getFullYear();
-                }
-                return true;
+                return saleDate >= startTime && saleDate <= now;
             });
 
             let totalTires = 0, totalServ = 0, totalProd = 0;
@@ -1282,7 +1278,7 @@
 
             filteredSales.forEach(s => {
                 const sDate = new Date(s.date);
-                const dateStr = sDate.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
+                const dateStr = sDate.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: '2-digit' });
                 const timeStr = sDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
                 
                 let paymentBadge = "";
@@ -1342,7 +1338,7 @@
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
 
-            // ACTUALIZAR TOTALES DE LA ESQUINA SUPERIOR DERECHA DE LAS LISTAS
+            // Actualizar Totales en las Esquinas Superiores de cada Lista
             document.getElementById('list-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
             document.getElementById('list-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('list-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
@@ -1357,7 +1353,7 @@
             renderReportTables(tiresSalesList, servicesSalesList, productsSalesList);
             renderYapeTables(yapeTiresList, yapeServicesList, yapeProductsList);
 
-            // Gráficos
+            // Actualizar Gráficos de Barras y Torta
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
@@ -1367,6 +1363,7 @@
             tireChartInstance.data.datasets[0].data = tireData.length ? tireData : [0];
             tireChartInstance.update();
 
+            // Gráfico de Tendencia de Ingresos
             let lineLabels = [];
             let lineValues = [];
 
@@ -1381,11 +1378,12 @@
                     }
                 });
             } else if (timeframe === 'week') {
-                lineLabels = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                lineLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
                 lineValues = new Array(7).fill(0);
                 filteredSales.forEach(s => {
-                    const dayIdx = new Date(s.date).getDay();
-                    lineValues[dayIdx] += s.total;
+                    const d = new Date(s.date).getDay();
+                    const idx = d === 0 ? 6 : d - 1; // Ajustar orden empezando el Lunes
+                    lineValues[idx] += s.total;
                 });
             } else if (timeframe === 'month') {
                 lineLabels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
@@ -1417,7 +1415,7 @@
             const fillTable = (tbody, items) => {
                 tbody.innerHTML = "";
                 if(items.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">Sin ventas registradas</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">Sin ventas registradas en este período</td></tr>`;
                     return;
                 }
                 items.forEach(i => {
@@ -1468,7 +1466,6 @@
             fillYapeTable(prodTbody, products);
         }
 
-        /* --- ALMACENAMIENTO Y RESPALDO (EXPORTAR Y SUBIR DATOS) --- */
         function saveToStorage() {
             localStorage.setItem('chayo_catalog', JSON.stringify(itemsCatalog));
             localStorage.setItem('chayo_sales', JSON.stringify(salesHistory));
@@ -1481,7 +1478,6 @@
             if(sales) salesHistory = JSON.parse(sales);
         }
 
-        // Descargar todos los datos del sistema a un archivo .json
         function exportData() {
             const backupData = {
                 catalog: itemsCatalog,
@@ -1497,7 +1493,6 @@
             downloadAnchor.remove();
         }
 
-        // Cargar o Subir datos al programa desde la laptop o tablet
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1510,7 +1505,6 @@
                         itemsCatalog = data.catalog;
                         salesHistory = data.sales;
                     } else if (Array.isArray(data)) {
-                        // Compatibilidad si solo se subió el historial
                         salesHistory = data;
                     } else {
                         alert("El archivo subido no tiene una estructura válida de respaldo.");
