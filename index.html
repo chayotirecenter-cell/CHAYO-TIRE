@@ -31,7 +31,6 @@
             color: #D32F2F;
             font-weight: bold;
         }
-        /* Ocultar botones de incremento/decremento en inputs numéricos */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -63,13 +62,22 @@
                 <button onclick="switchTab('reportes')" id="tab-btn-reportes" class="py-2 px-1 text-gray-500 hover:text-chayoRed transition"><i class="fa-solid fa-chart-line mr-2"></i>Reportes e Ingresos</button>
             </nav>
 
-            <!-- CONTROLES EXTRA (MODO NOCHE Y EXPORTAR) -->
-            <div class="flex items-center space-x-3">
-                <button onclick="exportData()" title="Descargar datos del día" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center">
-                    <i class="fa-solid fa-download mr-2"></i><span class="hidden sm:inline">Exportar Ventas</span>
+            <!-- CONTROLES EXTRA (RESPALDO, CARGA Y MODO NOCHE) -->
+            <div class="flex items-center space-x-2">
+                <!-- Botón Exportar / Guardar -->
+                <button onclick="exportData()" title="Descargar Respaldo Completo" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center">
+                    <i class="fa-solid fa-download mr-1"></i><span class="hidden sm:inline">Guardar Resp.</span>
                 </button>
+                
+                <!-- Botón Subir / Cargar Datos -->
+                <button onclick="document.getElementById('import-file-input').click()" title="Subir / Cargar Datos Guardados" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center">
+                    <i class="fa-solid fa-upload mr-1"></i><span class="hidden sm:inline">Cargar Datos</span>
+                </button>
+                <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importData(event)">
+
+                <!-- Modo Oscuro -->
                 <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-400 hover:bg-gray-300 transition">
-                    <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
                 </button>
             </div>
         </div>
@@ -128,7 +136,7 @@
                             </div>
                         </div>
 
-                        <!-- Lista Carrito -->
+                        <!-- Lista Carrito Con Controles de Incremento / Decremento -->
                         <div class="max-h-48 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
@@ -136,7 +144,7 @@
                                         <th class="p-1">Item</th>
                                         <th class="p-1 text-center">Cant.</th>
                                         <th class="p-1 text-right">Total</th>
-                                        <th class="p-1 text-center"></th>
+                                        <th class="p-1 text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cart-table-body"></tbody>
@@ -148,7 +156,7 @@
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-sm font-medium">Descuento:</span>
                                 <div class="flex space-x-1 w-2/3">
-                                    <input type="number" id="discount-val" placeholder="" min="0" onchange="calculateTotals()" onkeyup="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-right text-sm">
+                                    <input type="number" id="discount-val" placeholder="0" min="0" onchange="calculateTotals()" onkeyup="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-right text-sm">
                                     <select id="discount-type" onchange="calculateTotals()" class="w-1/2 p-1 border rounded dark:bg-gray-800 dark:border-gray-700 text-sm">
                                         <option value="soles">S/.</option>
                                         <option value="percent">%</option>
@@ -156,28 +164,50 @@
                                 </div>
                             </div>
 
+                            <!-- Opciones de Selección de Medio de Pago -->
                             <div>
                                 <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Medio de Pago</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button type="button" onclick="selectPayment('efectivo')" id="pay-efectivo" class="py-2 rounded-lg border-2 border-green-600 bg-green-50 dark:bg-green-950 font-semibold text-green-700 dark:text-green-300 text-sm flex items-center justify-center">
-                                        <i class="fa-solid fa-money-bill-wave mr-2"></i>Efectivo
+                                <div class="grid grid-cols-3 gap-1">
+                                    <button type="button" onclick="selectPayment('efectivo')" id="pay-efectivo" class="py-2 rounded-lg border-2 border-green-600 bg-green-50 dark:bg-green-950 font-semibold text-green-700 dark:text-green-300 text-xs flex items-center justify-center">
+                                        <i class="fa-solid fa-money-bill-wave mr-1"></i>Efectivo
                                     </button>
-                                    <button type="button" onclick="selectPayment('yape')" id="pay-yape" class="py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center">
-                                        <i class="fa-solid fa-mobile-screen mr-2"></i>Yape
+                                    <button type="button" onclick="selectPayment('yape')" id="pay-yape" class="py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-xs flex items-center justify-center">
+                                        <i class="fa-solid fa-mobile-screen mr-1"></i>Yape
+                                    </button>
+                                    <button type="button" onclick="selectPayment('mixto')" id="pay-mixto" class="py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-xs flex items-center justify-center">
+                                        <i class="fa-solid fa-sliders mr-1"></i>Mixto
                                     </button>
                                 </div>
                             </div>
 
+                            <!-- Cálculo de Efectivo Tradicional -->
                             <div id="cash-calculation-box" class="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg space-y-2">
                                 <div class="flex justify-between items-center text-sm">
                                     <span>Monto Recibido:</span>
-                                    <input type="number" id="amount-paid" placeholder="" min="0" onkeyup="calculateTotals()" onchange="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-700 dark:border-gray-600 text-sm">
+                                    <input type="number" id="amount-paid" placeholder="0.00" min="0" onkeyup="calculateTotals()" onchange="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-700 dark:border-gray-600 text-sm">
                                 </div>
                                 <div class="flex justify-between items-center font-bold text-sm">
                                     <span>Vuelto a Devolver:</span>
                                     <span id="change-amount" class="text-green-600 dark:text-green-400">S/. 0.00</span>
                                 </div>
                             </div>
+
+                            <!-- Cálculo de Pago Mixto (Yape + Efectivo) -->
+                            <div id="mixed-payment-box" class="hidden bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 p-2.5 rounded-lg space-y-2 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-purple-700 dark:text-purple-300"><i class="fa-solid fa-mobile-screen mr-1"></i>Pago Yape:</span>
+                                    <input type="number" id="mixed-yape-amount" placeholder="0.00" min="0" onkeyup="calculateTotals()" onchange="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-800 dark:border-gray-700">
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-green-700 dark:text-green-300"><i class="fa-solid fa-money-bill-wave mr-1"></i>Pago Efectivo:</span>
+                                    <input type="number" id="mixed-cash-amount" placeholder="0.00" min="0" onkeyup="calculateTotals()" onchange="calculateTotals()" class="w-28 p-1 border rounded text-right dark:bg-gray-800 dark:border-gray-700">
+                                </div>
+                                <div class="flex justify-between items-center font-bold border-t border-purple-200 dark:border-purple-800 pt-1 text-sm">
+                                    <span>Vuelto / Restante:</span>
+                                    <span id="mixed-change-amount" class="text-gray-800 dark:text-gray-200">S/. 0.00</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -197,7 +227,6 @@
 
         <!-- ================= PESTAÑA: ALMACÉN ================= -->
         <section id="tab-almacen" class="hidden space-y-8">
-            <!-- TARJETA SUPERIOR -->
             <div class="bg-gradient-to-r from-red-600 to-chayoRed text-white p-6 rounded-xl shadow-md flex justify-between items-center">
                 <div>
                     <p class="text-sm uppercase font-semibold tracking-wider text-red-100">Inversión Total en Almacén (Llantas + Insumos)</p>
@@ -237,7 +266,6 @@
                     </div>
                 </form>
 
-                <!-- TABLA DE LLANTAS REGISTRADAS -->
                 <div class="mt-4 pt-4 border-t dark:border-gray-700">
                     <h4 class="font-bold text-sm text-gray-600 dark:text-gray-300 mb-2">Inventario de Llantas Registradas</h4>
                     <div class="overflow-x-auto max-h-60 overflow-y-auto">
@@ -285,7 +313,6 @@
                     </div>
                 </form>
 
-                <!-- TABLA DE PRODUCTOS REGISTRADOS -->
                 <div class="mt-4 pt-4 border-t dark:border-gray-700">
                     <h4 class="font-bold text-sm text-gray-600 dark:text-gray-300 mb-2">Inventario de Productos / Insumos</h4>
                     <div class="overflow-x-auto max-h-60 overflow-y-auto">
@@ -317,7 +344,6 @@
                     <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Servicio</button>
                 </form>
 
-                <!-- TABLA DE SERVICIOS REGISTRADOS -->
                 <div class="mt-4 pt-4 border-t dark:border-gray-700">
                     <h4 class="font-bold text-sm text-gray-600 dark:text-gray-300 mb-2">Catálogo de Servicios</h4>
                     <div class="overflow-x-auto max-h-60 overflow-y-auto">
@@ -340,13 +366,17 @@
 
         <!-- ================= PESTAÑA: REPORTES E INGRESOS ================= -->
         <section id="tab-reportes" class="hidden space-y-6">
-            <div class="flex justify-between items-center flex-wrap gap-3">
-                <h2 class="text-2xl font-bold">Reporte de Ingresos</h2>
-                <div class="inline-flex rounded-md shadow-sm" role="group">
-                    <button onclick="updateCharts('day')" id="btn-time-day" class="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 rounded-l-lg bg-chayoRed text-white">Día</button>
-                    <button onclick="updateCharts('week')" id="btn-time-week" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">Semana</button>
-                    <button onclick="updateCharts('month')" id="btn-time-month" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">Mes</button>
-                    <button onclick="updateCharts('year')" id="btn-time-year" class="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 rounded-r-lg bg-white dark:bg-gray-800">Año</button>
+            <!-- BOTONES DE NAVEGACIÓN DE PERÍODOS (DÍA, SEMANA, MES, AÑO) -->
+            <div class="flex justify-between items-center flex-wrap gap-3 bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md">
+                <div>
+                    <h2 class="text-2xl font-bold">Reporte de Ingresos del Local</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Selecciona el período para calcular el total generado al finalizar tus labores.</p>
+                </div>
+                <div class="inline-flex rounded-lg shadow-sm" role="group">
+                    <button onclick="updateCharts('day')" id="btn-time-day" class="px-4 py-2 text-sm font-bold border border-gray-300 dark:border-gray-700 rounded-l-lg bg-chayoRed text-white">Día</button>
+                    <button onclick="updateCharts('week')" id="btn-time-week" class="px-4 py-2 text-sm font-bold border-t border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">Semana</button>
+                    <button onclick="updateCharts('month')" id="btn-time-month" class="px-4 py-2 text-sm font-bold border-t border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">Mes</button>
+                    <button onclick="updateCharts('year')" id="btn-time-year" class="px-4 py-2 text-sm font-bold border border-gray-300 dark:border-gray-700 rounded-r-lg bg-white dark:bg-gray-800">Año</button>
                 </div>
             </div>
 
@@ -375,7 +405,7 @@
                 </div>
             </div>
 
-            <!-- RESUMEN GLOBAL DE VENTAS (TOTALES COMBINADOS) -->
+            <!-- RESUMEN GLOBAL DE VENTAS -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-l-4 border-red-500">
                     <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Ventas Llantas</p>
@@ -390,7 +420,7 @@
                     <h3 id="report-total-products" class="text-2xl font-black mt-1">S/. 0.00</h3>
                 </div>
                 <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-l-4 border-green-500">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total Ventas General</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Total General Generado</p>
                     <h3 id="report-total-combined" class="text-2xl font-black text-green-600 dark:text-green-400 mt-1">S/. 0.00</h3>
                 </div>
             </div>
@@ -401,7 +431,7 @@
                     <div class="relative h-64"><canvas id="barChart"></canvas></div>
                 </div>
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
-                    <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Distribución de Ventas de Llantas (Dona)</h3>
+                    <h3 class="font-bold text-sm mb-4 uppercase text-gray-500">Distribución de Llantas Vendidas</h3>
                     <div class="relative h-64"><canvas id="tireChart"></canvas></div>
                 </div>
                 <div class="bg-white dark:bg-chayoGray p-5 rounded-xl shadow-md">
@@ -410,18 +440,25 @@
                 </div>
             </div>
 
-            <!-- DETALLE DE VENTAS REGISTRADAS (EFECTIVO + YAPE) -->
+            <!-- DETALLE DE VENTAS CON TOTALES EN LA ESQUINA SUPERIOR DERECHA DE CADA LISTA -->
             <div class="space-y-6 pt-4">
                 <h3 class="text-xl font-bold border-b pb-2 dark:border-gray-700 flex items-center text-gray-700 dark:text-gray-200">
-                    <i class="fa-solid fa-list-check mr-2 text-chayoRed"></i>Detalle de Ventas Registradas (Todas las formas de Pago)
+                    <i class="fa-solid fa-list-check mr-2 text-chayoRed"></i>Detalle de Ingresos por Categoria
                 </h3>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- LISTA LLANTAS -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-chayoRed">
-                        <h4 class="font-bold text-base mb-3 text-chayoRed flex justify-between items-center">
-                            <span><i class="fa-solid fa-compact-disc mr-2"></i>Llantas Vendidas</span>
-                        </h4>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-base text-chayoRed flex items-center">
+                                <i class="fa-solid fa-compact-disc mr-2"></i>Llantas Vendidas
+                            </h4>
+                            <!-- TOTAL EN LA ESQUINA SUPERIOR DERECHA DE LA LISTA -->
+                            <div class="text-right bg-red-50 dark:bg-red-950 px-2 py-1 rounded-lg border border-red-200 dark:border-red-800">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Llantas</p>
+                                <span id="list-total-tires" class="text-sm font-black text-chayoRed">S/. 0.00</span>
+                            </div>
+                        </div>
                         <div class="overflow-x-auto max-h-72 overflow-y-auto">
                             <table class="w-full text-xs text-left">
                                 <thead class="text-gray-500 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -440,9 +477,16 @@
 
                     <!-- LISTA SERVICIOS -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-blue-500">
-                        <h4 class="font-bold text-base mb-3 text-blue-600 dark:text-blue-400 flex justify-between items-center">
-                            <span><i class="fa-solid fa-wrench mr-2"></i>Servicios Realizados</span>
-                        </h4>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-base text-blue-600 dark:text-blue-400 flex items-center">
+                                <i class="fa-solid fa-wrench mr-2"></i>Servicios Realizados
+                            </h4>
+                            <!-- TOTAL EN LA ESQUINA SUPERIOR DERECHA DE LA LISTA -->
+                            <div class="text-right bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Servicios</p>
+                                <span id="list-total-services" class="text-sm font-black text-blue-600 dark:text-blue-400">S/. 0.00</span>
+                            </div>
+                        </div>
                         <div class="overflow-x-auto max-h-72 overflow-y-auto">
                             <table class="w-full text-xs text-left">
                                 <thead class="text-gray-500 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -461,9 +505,16 @@
 
                     <!-- LISTA PRODUCTOS -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-yellow-500">
-                        <h4 class="font-bold text-base mb-3 text-yellow-600 dark:text-yellow-400 flex justify-between items-center">
-                            <span><i class="fa-solid fa-box mr-2"></i>Productos / Insumos</span>
-                        </h4>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-base text-yellow-600 dark:text-yellow-400 flex items-center">
+                                <i class="fa-solid fa-box mr-2"></i>Productos y Insumos
+                            </h4>
+                            <!-- TOTAL EN LA ESQUINA SUPERIOR DERECHA DE LA LISTA -->
+                            <div class="text-right bg-yellow-50 dark:bg-yellow-950 px-2 py-1 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold">Total Productos</p>
+                                <span id="list-total-products" class="text-sm font-black text-yellow-600 dark:text-yellow-400">S/. 0.00</span>
+                            </div>
+                        </div>
                         <div class="overflow-x-auto max-h-72 overflow-y-auto">
                             <table class="w-full text-xs text-left">
                                 <thead class="text-gray-500 uppercase bg-gray-50 dark:bg-gray-800 sticky top-0">
@@ -482,20 +533,19 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN NUEVA: DETALLE EXCLUSIVO DE PAGOS CON YAPE -->
+            <!-- DETALLE EXCLUSIVO DE PAGOS YAPE Y MIXTOS -->
             <div class="space-y-6 pt-6 border-t-2 border-purple-200 dark:border-purple-900">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-bold flex items-center text-purple-700 dark:text-purple-300">
-                        <i class="fa-solid fa-mobile-screen mr-2 text-purple-600"></i>Detalle Exclusivo de Pagos en YAPE
+                        <i class="fa-solid fa-mobile-screen mr-2 text-purple-600"></i>Detalle Exclusivo de Cobros por YAPE / Mixtos
                     </h3>
                     <div class="bg-purple-100 dark:bg-purple-900/50 border border-purple-300 dark:border-purple-700 px-4 py-2 rounded-xl flex items-center space-x-2">
-                        <span class="text-xs font-bold uppercase text-purple-800 dark:text-purple-200">Total Cobrado con Yape:</span>
+                        <span class="text-xs font-bold uppercase text-purple-800 dark:text-purple-200">Total Yape Acumulado:</span>
                         <span id="report-total-yape-grand" class="text-lg font-black text-purple-700 dark:text-purple-300">S/. 0.00</span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- YAPE: LLANTAS -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-purple-600">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center">
@@ -518,7 +568,6 @@
                         </div>
                     </div>
 
-                    <!-- YAPE: SERVICIOS -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-purple-600">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center">
@@ -541,7 +590,6 @@
                         </div>
                     </div>
 
-                    <!-- YAPE: PRODUCTOS -->
                     <div class="bg-white dark:bg-chayoGray p-4 rounded-xl shadow-md border-t-4 border-purple-600">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center">
@@ -569,7 +617,7 @@
 
     </main>
 
-    <!-- MODAL DE EDICIÓN -->
+    <!-- MODAL DE EDICIÓN DE ÍTEMS -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-chayoGray p-6 rounded-xl max-w-md w-full shadow-2xl space-y-4">
             <h3 class="text-xl font-bold border-b pb-2 text-chayoRed"><i class="fa-solid fa-pen-to-square mr-2"></i>Editar Item</h3>
@@ -619,7 +667,7 @@
 
         let cart = [];
         let salesHistory = [];
-        let selectedPaymentMethod = 'efectivo';
+        let selectedPaymentMethod = 'efectivo'; // 'efectivo', 'yape', 'mixto'
         let barChartInstance = null;
         let lineChartInstance = null;
         let tireChartInstance = null;
@@ -668,21 +716,35 @@
             }
         }
 
+        /* --- MEDIOS DE PAGO (EFECTIVO, YAPE Y MIXTO) --- */
         function selectPayment(method) {
             selectedPaymentMethod = method;
             const btnEf = document.getElementById('pay-efectivo');
             const btnYape = document.getElementById('pay-yape');
+            const btnMixto = document.getElementById('pay-mixto');
+            
             const cashBox = document.getElementById('cash-calculation-box');
+            const mixedBox = document.getElementById('mixed-payment-box');
+
+            // Resetear estilos
+            [btnEf, btnYape, btnMixto].forEach(b => {
+                b.className = "py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-xs flex items-center justify-center";
+            });
 
             if (method === 'efectivo') {
-                btnEf.className = "py-2 rounded-lg border-2 border-green-600 bg-green-50 dark:bg-green-950 font-semibold text-green-700 dark:text-green-300 text-sm flex items-center justify-center";
-                btnYape.className = "py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center";
+                btnEf.className = "py-2 rounded-lg border-2 border-green-600 bg-green-50 dark:bg-green-950 font-semibold text-green-700 dark:text-green-300 text-xs flex items-center justify-center";
                 cashBox.classList.remove('hidden');
-            } else {
-                btnYape.className = "py-2 rounded-lg border-2 border-purple-600 bg-purple-50 dark:bg-purple-950 font-semibold text-purple-700 dark:text-purple-300 text-sm flex items-center justify-center";
-                btnEf.className = "py-2 rounded-lg border-2 border-gray-300 dark:border-gray-700 font-semibold text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center";
+                mixedBox.classList.add('hidden');
+            } else if (method === 'yape') {
+                btnYape.className = "py-2 rounded-lg border-2 border-purple-600 bg-purple-50 dark:bg-purple-950 font-semibold text-purple-700 dark:text-purple-300 text-xs flex items-center justify-center";
                 cashBox.classList.add('hidden');
+                mixedBox.classList.add('hidden');
+            } else if (method === 'mixto') {
+                btnMixto.className = "py-2 rounded-lg border-2 border-blue-600 bg-blue-50 dark:bg-blue-950 font-semibold text-blue-700 dark:text-blue-300 text-xs flex items-center justify-center";
+                cashBox.classList.add('hidden');
+                mixedBox.classList.remove('hidden');
             }
+            calculateTotals();
         }
 
         function renderCatalog(filter = "") {
@@ -703,7 +765,7 @@
                         <p class="text-xs text-gray-500">${detailText}</p>
                         <p class="text-sm font-bold text-chayoRed">S/. ${item.price.toFixed(2)}</p>
                     </div>
-                    <button class="bg-chayoRed text-white p-2 rounded-lg text-xs"><i class="fa-solid fa-plus"></i></button>
+                    <button class="bg-chayoRed text-white p-2 rounded-lg text-xs hover:bg-red-700"><i class="fa-solid fa-plus"></i></button>
                 `;
                 container.appendChild(card);
             });
@@ -730,8 +792,47 @@
         function addToCart(id) {
             const item = itemsCatalog.find(i => i.id === id);
             const inCart = cart.find(c => c.id === id);
-            if(inCart) inCart.qty++;
-            else cart.push({ ...item, qty: 1 });
+            if(inCart) {
+                if((item.type === 'llanta' || item.type === 'producto') && inCart.qty >= item.stock) {
+                    alert(`No puedes agregar más. El stock máximo disponible es de ${item.stock} unidades.`);
+                    return;
+                }
+                inCart.qty++;
+            } else {
+                if((item.type === 'llanta' || item.type === 'producto') && item.stock <= 0) {
+                    alert("Este producto no tiene stock disponible.");
+                    return;
+                }
+                cart.push({ ...item, qty: 1 });
+            }
+            renderCart();
+        }
+
+        /* --- CONTROL DE DISMINUIR E INCREMENTAR EN CAJA --- */
+        function decreaseCartItem(index) {
+            if (cart[index].qty > 1) {
+                cart[index].qty--;
+            } else {
+                cart.splice(index, 1);
+            }
+            renderCart();
+        }
+
+        function increaseCartItem(index) {
+            const item = cart[index];
+            const catItem = itemsCatalog.find(i => i.id === item.id);
+            if(catItem && (catItem.type === 'llanta' || catItem.type === 'producto')) {
+                if(item.qty >= catItem.stock) {
+                    alert(`Alcanzaste el límite de stock disponible (${catItem.stock} un.)`);
+                    return;
+                }
+            }
+            item.qty++;
+            renderCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
             renderCart();
         }
 
@@ -743,20 +844,27 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b dark:border-gray-800";
                 tr.innerHTML = `
-                    <td class="p-1">${item.name}</td>
-                    <td class="p-1 text-center">${item.qty}</td>
-                    <td class="p-1 text-right font-bold">S/. ${(item.price * item.qty).toFixed(2)}</td>
-                    <td class="p-1 text-center"><button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td>
+                    <td class="p-1 font-medium">${item.name}</td>
+                    <td class="p-1 text-center font-bold">
+                        <div class="inline-flex items-center space-x-1">
+                            <button onclick="decreaseCartItem(${index})" title="Disminuir" class="bg-gray-200 dark:bg-gray-700 hover:bg-red-500 hover:text-white text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-xs transition">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                            <span class="px-1">${item.qty}</span>
+                            <button onclick="increaseCartItem(${index})" title="Aumentar" class="bg-gray-200 dark:bg-gray-700 hover:bg-green-500 hover:text-white text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-xs transition">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="p-1 text-right font-bold text-chayoRed">S/. ${(item.price * item.qty).toFixed(2)}</td>
+                    <td class="p-1 text-center">
+                        <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 ml-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
 
             calculateTotals();
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            renderCart();
         }
 
         function calculateTotals() {
@@ -768,9 +876,25 @@
             let total = Math.max(0, subtotal - discount);
             document.getElementById('cart-total-text').innerText = `S/. ${total.toFixed(2)}`;
 
-            let paid = parseFloat(document.getElementById('amount-paid').value) || 0;
-            let change = paid - total;
-            document.getElementById('change-amount').innerText = `S/. ${change > 0 ? change.toFixed(2) : '0.00'}`;
+            if (selectedPaymentMethod === 'efectivo') {
+                let paid = parseFloat(document.getElementById('amount-paid').value) || 0;
+                let change = paid - total;
+                document.getElementById('change-amount').innerText = `S/. ${change > 0 ? change.toFixed(2) : '0.00'}`;
+            } else if (selectedPaymentMethod === 'mixto') {
+                let yapePaid = parseFloat(document.getElementById('mixed-yape-amount').value) || 0;
+                let cashPaid = parseFloat(document.getElementById('mixed-cash-amount').value) || 0;
+                let totalPaid = yapePaid + cashPaid;
+                let diff = totalPaid - total;
+
+                const mixedChangeElem = document.getElementById('mixed-change-amount');
+                if (diff >= 0) {
+                    mixedChangeElem.innerText = `S/. ${diff.toFixed(2)} (Vuelto Ef.)`;
+                    mixedChangeElem.className = "text-green-600 dark:text-green-400 font-bold";
+                } else {
+                    mixedChangeElem.innerText = `Falta S/. ${Math.abs(diff).toFixed(2)}`;
+                    mixedChangeElem.className = "text-red-600 dark:text-red-400 font-bold";
+                }
+            }
 
             return total;
         }
@@ -782,6 +906,22 @@
             const total = calculateTotals();
             const client = document.getElementById('cart-client').value || "Cliente Varios";
             const plate = document.getElementById('cart-plate').value || "S/P";
+
+            let yapeAmount = 0;
+            let cashAmount = 0;
+
+            if (selectedPaymentMethod === 'efectivo') {
+                cashAmount = total;
+            } else if (selectedPaymentMethod === 'yape') {
+                yapeAmount = total;
+            } else if (selectedPaymentMethod === 'mixto') {
+                yapeAmount = parseFloat(document.getElementById('mixed-yape-amount').value) || 0;
+                cashAmount = parseFloat(document.getElementById('mixed-cash-amount').value) || 0;
+
+                if ((yapeAmount + cashAmount) < total) {
+                    return alert("El monto ingresado en Yape + Efectivo es menor al total a pagar.");
+                }
+            }
 
             const discountFactor = subtotal > 0 ? (total / subtotal) : 1;
 
@@ -797,6 +937,8 @@
                 plate,
                 items: finalCartItems,
                 paymentMethod: selectedPaymentMethod,
+                yapeAmount,
+                cashAmount,
                 total
             };
 
@@ -818,12 +960,15 @@
             document.getElementById('cart-client').value = "";
             document.getElementById('cart-plate').value = "";
             document.getElementById('amount-paid').value = "";
+            document.getElementById('mixed-yape-amount').value = "";
+            document.getElementById('mixed-cash-amount').value = "";
             document.getElementById('discount-val').value = "";
             renderCart();
             renderCatalog();
             renderShortcuts();
             renderInventoryTables();
             updateTotalPurchaseCost();
+            alert("¡Venta completada con éxito!");
         }
 
         /* --- RENDERING TABLAS DE INVENTARIO EN ALMACÉN --- */
@@ -879,7 +1024,7 @@
             });
         }
 
-        /* --- MODAL EDICIÓN DE ÍTEMS --- */
+        /* --- MODAL EDICIÓN --- */
         function openEditModal(id) {
             const item = itemsCatalog.find(i => i.id === id);
             if (!item) return;
@@ -1024,7 +1169,7 @@
             document.getElementById('total-purchase-cost').innerText = `S/. ${totalCost.toFixed(2)}`;
         }
 
-        /* --- REPORTES --- */
+        /* --- REPORTES CON GRÁFICOS Y LISTAS FILTRADAS POR PERÍODOS --- */
         function initCharts() {
             const ctxBar = document.getElementById('barChart').getContext('2d');
             const ctxLine = document.getElementById('lineChart').getContext('2d');
@@ -1074,7 +1219,7 @@
 
             lowStockItems.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-red-200 dark:border-red-900 bg-red-100/70 dark:bg-red-900/30 hover:bg-red-200/80 font-semibold";
+                tr.className = "border-b border-red-200 dark:border-red-900 bg-red-100/70 dark:bg-red-900/30 font-semibold";
 
                 const categoryBadge = item.type === 'llanta' 
                     ? `<span class="bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100 px-2 py-0.5 rounded text-[10px] uppercase font-bold"><i class="fa-solid fa-compact-disc mr-1"></i>Llanta</span>`
@@ -1096,8 +1241,8 @@
                 const btn = document.getElementById(`btn-time-${t}`);
                 if(btn) {
                     btn.className = (t === timeframe) 
-                        ? "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-chayoRed text-white" 
-                        : "px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800";
+                        ? "px-4 py-2 text-sm font-bold border border-gray-300 dark:border-gray-700 bg-chayoRed text-white" 
+                        : "px-4 py-2 text-sm font-bold border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200";
                 }
             });
 
@@ -1127,7 +1272,6 @@
             let servicesSalesList = [];
             let productsSalesList = [];
 
-            // Listas específicas para Yape
             let yapeTiresList = [];
             let yapeServicesList = [];
             let yapeProductsList = [];
@@ -1140,11 +1284,15 @@
                 const sDate = new Date(s.date);
                 const dateStr = sDate.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
                 const timeStr = sDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
-                const isYape = s.paymentMethod === 'yape';
-
-                const paymentBadge = isYape 
-                    ? `<span class="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Yape</span>` 
-                    : `<span class="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Efectivo</span>`;
+                
+                let paymentBadge = "";
+                if(s.paymentMethod === 'yape') {
+                    paymentBadge = `<span class="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Yape</span>`;
+                } else if(s.paymentMethod === 'mixto') {
+                    paymentBadge = `<span class="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Mixto</span>`;
+                } else {
+                    paymentBadge = `<span class="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Efectivo</span>`;
+                }
 
                 s.items.forEach(i => {
                     const amount = i.price * i.qty;
@@ -1161,37 +1309,45 @@
                         tireCounts[i.name] = (tireCounts[i.name] || 0) + i.qty;
                         tiresSalesList.push(itemDetail);
 
-                        if(isYape) {
+                        if(s.paymentMethod === 'yape' || s.paymentMethod === 'mixto') {
                             yapeTiresList.push(itemDetail);
-                            yapeTiresTotal += amount;
+                            let yAmount = s.paymentMethod === 'mixto' ? (s.yapeAmount || 0) : amount;
+                            yapeTiresTotal += yAmount;
                         }
                     } else if(i.type === 'servicio') {
                         totalServ += amount;
                         servicesSalesList.push(itemDetail);
 
-                        if(isYape) {
+                        if(s.paymentMethod === 'yape' || s.paymentMethod === 'mixto') {
                             yapeServicesList.push(itemDetail);
-                            yapeServicesTotal += amount;
+                            let yAmount = s.paymentMethod === 'mixto' ? (s.yapeAmount || 0) : amount;
+                            yapeServicesTotal += yAmount;
                         }
                     } else if(i.type === 'producto') {
                         totalProd += amount;
                         productsSalesList.push(itemDetail);
 
-                        if(isYape) {
+                        if(s.paymentMethod === 'yape' || s.paymentMethod === 'mixto') {
                             yapeProductsList.push(itemDetail);
-                            yapeProductsTotal += amount;
+                            let yAmount = s.paymentMethod === 'mixto' ? (s.yapeAmount || 0) : amount;
+                            yapeProductsTotal += yAmount;
                         }
                     }
                 });
             });
 
-            // Actualizar Cuadros Principales Totales (Globales)
+            // Actualizar Tarjetas Principales
             document.getElementById('report-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
             document.getElementById('report-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
 
-            // Actualizar Totales de Yape
+            // ACTUALIZAR TOTALES DE LA ESQUINA SUPERIOR DERECHA DE LAS LISTAS
+            document.getElementById('list-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
+            document.getElementById('list-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
+            document.getElementById('list-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
+
+            // Actualizar Totales Exclusivos de Yape
             document.getElementById('yape-tires-total').innerText = `S/. ${yapeTiresTotal.toFixed(2)}`;
             document.getElementById('yape-services-total').innerText = `S/. ${yapeServicesTotal.toFixed(2)}`;
             document.getElementById('yape-products-total').innerText = `S/. ${yapeProductsTotal.toFixed(2)}`;
@@ -1201,6 +1357,7 @@
             renderReportTables(tiresSalesList, servicesSalesList, productsSalesList);
             renderYapeTables(yapeTiresList, yapeServicesList, yapeProductsList);
 
+            // Gráficos
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
@@ -1265,7 +1422,7 @@
                 }
                 items.forEach(i => {
                     const tr = document.createElement('tr');
-                    tr.className = "border-b dark:border-gray-800";
+                    tr.className = "border-b dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50";
                     tr.innerHTML = `
                         <td class="p-2 whitespace-nowrap text-[11px] text-gray-500">${i.dateTime}</td>
                         <td class="p-2 font-bold">${i.name}</td>
@@ -1290,12 +1447,12 @@
             const fillYapeTable = (tbody, items) => {
                 tbody.innerHTML = "";
                 if(items.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin ventas por Yape</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin registros por Yape</td></tr>`;
                     return;
                 }
                 items.forEach(i => {
                     const tr = document.createElement('tr');
-                    tr.className = "border-b dark:border-gray-800";
+                    tr.className = "border-b dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50";
                     tr.innerHTML = `
                         <td class="p-2 whitespace-nowrap text-[11px] text-gray-500">${i.dateTime}</td>
                         <td class="p-2 font-bold">${i.name}</td>
@@ -1311,6 +1468,7 @@
             fillYapeTable(prodTbody, products);
         }
 
+        /* --- ALMACENAMIENTO Y RESPALDO (EXPORTAR Y SUBIR DATOS) --- */
         function saveToStorage() {
             localStorage.setItem('chayo_catalog', JSON.stringify(itemsCatalog));
             localStorage.setItem('chayo_sales', JSON.stringify(salesHistory));
@@ -1323,14 +1481,54 @@
             if(sales) salesHistory = JSON.parse(sales);
         }
 
+        // Descargar todos los datos del sistema a un archivo .json
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(salesHistory, null, 2));
+            const backupData = {
+                catalog: itemsCatalog,
+                sales: salesHistory,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `ventas_chayo_${new Date().toISOString().slice(0,10)}.json`);
+            downloadAnchor.setAttribute("download", `CHAYO_Sistema_Respaldo_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
+        }
+
+        // Cargar o Subir datos al programa desde la laptop o tablet
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.catalog && data.sales) {
+                        itemsCatalog = data.catalog;
+                        salesHistory = data.sales;
+                    } else if (Array.isArray(data)) {
+                        // Compatibilidad si solo se subió el historial
+                        salesHistory = data;
+                    } else {
+                        alert("El archivo subido no tiene una estructura válida de respaldo.");
+                        return;
+                    }
+
+                    saveToStorage();
+                    renderCatalog();
+                    renderShortcuts();
+                    renderCart();
+                    renderInventoryTables();
+                    updateTotalPurchaseCost();
+                    alert("¡Todos los datos han sido subidos y sincronizados con éxito!");
+                } catch (err) {
+                    alert("Ocurrió un error al procesar el archivo. Asegúrate de que sea un archivo JSON correcto.");
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
