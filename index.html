@@ -785,13 +785,11 @@
             const inCart = cart.find(c => c.id === id);
             if(inCart) {
                 if((item.type === 'llanta' || item.type === 'producto') && inCart.qty >= item.stock) {
-                    alert(`No puedes agregar más. El stock máximo disponible es de ${item.stock} unidades.`);
                     return;
                 }
                 inCart.qty++;
             } else {
                 if((item.type === 'llanta' || item.type === 'producto') && item.stock <= 0) {
-                    alert("Este producto no tiene stock disponible.");
                     return;
                 }
                 cart.push({ ...item, qty: 1, discount: 0 });
@@ -818,7 +816,6 @@
             const catItem = itemsCatalog.find(i => i.id === item.id);
             if(catItem && (catItem.type === 'llanta' || catItem.type === 'producto')) {
                 if(item.qty >= catItem.stock) {
-                    alert(`Alcanzaste el límite de stock disponible (${catItem.stock} un.)`);
                     return;
                 }
             }
@@ -893,7 +890,7 @@
         }
 
         function processSale() {
-            if(cart.length === 0) return alert("Añade al menos un producto o servicio al carrito.");
+            if(cart.length === 0) return;
 
             const total = calculateTotals();
             const client = document.getElementById('cart-client').value || "Cliente Varios";
@@ -911,7 +908,7 @@
                 cashAmount = parseFloat(document.getElementById('mixed-cash-amount').value) || 0;
 
                 if ((yapeAmount + cashAmount) < total) {
-                    return alert("El monto ingresado en Yape + Efectivo es menor al total a pagar.");
+                    return;
                 }
             }
 
@@ -957,7 +954,6 @@
             renderShortcuts();
             renderInventoryTables();
             updateTotalPurchaseCost();
-            alert("¡Venta completada con éxito!");
         }
 
         function renderInventoryTables() {
@@ -1068,13 +1064,11 @@
         }
 
         function deleteItem(id) {
-            if (confirm("¿Estás seguro de que deseas eliminar este ítem?")) {
-                itemsCatalog = itemsCatalog.filter(i => i.id !== id);
-                saveToStorage();
-                renderCatalog();
-                renderInventoryTables();
-                updateTotalPurchaseCost();
-            }
+            itemsCatalog = itemsCatalog.filter(i => i.id !== id);
+            saveToStorage();
+            renderCatalog();
+            renderInventoryTables();
+            updateTotalPurchaseCost();
         }
 
         function calcTireProfit() {
@@ -1261,7 +1255,6 @@
             const select = document.getElementById('week-select');
             select.innerHTML = "";
 
-            // Agrupa las semanas transcurridas dinámicamente
             for (let i = 0; i < 8; i++) {
                 const start = new Date();
                 start.setDate(start.getDate() - (start.getDay() || 7) + 1 - (i * 7));
@@ -1506,7 +1499,6 @@
                         itemsCatalog = data.catalog;
                         salesHistory = data.sales;
                     } else {
-                        alert("Estructura de archivo no válida.");
                         return;
                     }
 
@@ -1516,9 +1508,8 @@
                     renderCart();
                     renderInventoryTables();
                     updateTotalPurchaseCost();
-                    alert("¡Datos cargados con éxito!");
                 } catch (err) {
-                    alert("Error al cargar el archivo de respaldo.");
+                    // Carga fallida
                 }
             };
             reader.readAsText(file);
