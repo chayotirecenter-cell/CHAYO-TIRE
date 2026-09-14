@@ -129,7 +129,7 @@
                             </div>
                         </div>
 
-                        <!-- LISTA CARRITO CON DESCUENTO INDIVIDUAL SIN VALOR POR DEFECTO -->
+                        <!-- LISTA CARRITO CON DESCUENTO INDIVIDUAL EN BLANCO -->
                         <div class="max-h-64 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
@@ -778,17 +778,19 @@
             });
         }
 
-        // AGREGAR AL CARRITO (DESCUENTO INICIALIZADO EN BLANCO/VACÍO)
+        // AGREGAR AL CARRITO CON DESCUENTO INICIALIZADO EN BLANCO ("")
         function addToCart(id) {
             const item = itemsCatalog.find(i => i.id === id);
             const inCart = cart.find(c => c.id === id);
             if(inCart) {
                 if((item.type === 'llanta' || item.type === 'producto') && inCart.qty >= item.stock) {
+                    alert(`No puedes agregar más. El stock máximo disponible es de ${item.stock} unidades.`);
                     return;
                 }
                 inCart.qty++;
             } else {
                 if((item.type === 'llanta' || item.type === 'producto') && item.stock <= 0) {
+                    alert("Este producto no tiene stock disponible.");
                     return;
                 }
                 cart.push({ ...item, qty: 1, discount: "" });
@@ -815,6 +817,7 @@
             const catItem = itemsCatalog.find(i => i.id === item.id);
             if(catItem && (catItem.type === 'llanta' || catItem.type === 'producto')) {
                 if(item.qty >= catItem.stock) {
+                    alert(`Alcanzaste el límite de stock disponible (${catItem.stock} un.)`);
                     return;
                 }
             }
@@ -832,8 +835,8 @@
             tbody.innerHTML = "";
 
             cart.forEach((item, index) => {
-                const discountVal = parseFloat(item.discount) || 0;
-                const itemTotal = Math.max(0, (item.price * item.qty) - discountVal);
+                const numDiscount = parseFloat(item.discount) || 0;
+                const itemTotal = Math.max(0, (item.price * item.qty) - numDiscount);
                 const tr = document.createElement('tr');
                 tr.className = "border-b dark:border-gray-800";
                 tr.innerHTML = `
@@ -849,7 +852,7 @@
                         </div>
                     </td>
                     <td class="p-1 text-center">
-                        <input type="number" min="0" step="0.5" placeholder="0.00" value="${item.discount !== undefined ? item.discount : ''}" onkeyup="updateCartDiscount(${index}, this.value)" onchange="updateCartDiscount(${index}, this.value)" class="w-16 p-1 border rounded text-right text-xs dark:bg-gray-800 dark:border-gray-700 font-bold text-red-500 outline-none">
+                        <input type="number" min="0" step="0.5" value="${item.discount !== undefined ? item.discount : ''}" placeholder="0" onkeyup="updateCartDiscount(${index}, this.value)" onchange="updateCartDiscount(${index}, this.value)" class="w-14 p-1 border rounded text-right text-xs dark:bg-gray-800 dark:border-gray-700 font-bold text-red-500">
                     </td>
                     <td class="p-1 text-right font-bold text-chayoRed">S/. ${itemTotal.toFixed(2)}</td>
                     <td class="p-1 text-center">
@@ -864,9 +867,10 @@
 
         function calculateTotals() {
             let total = cart.reduce((acc, i) => {
-                const disc = parseFloat(i.discount) || 0;
-                return acc + Math.max(0, (i.price * i.qty) - disc);
+                const numDiscount = parseFloat(i.discount) || 0;
+                return acc + Math.max(0, (i.price * i.qty) - numDiscount);
             }, 0);
+
             document.getElementById('cart-total-text').innerText = `S/. ${total.toFixed(2)}`;
 
             if (selectedPaymentMethod === 'efectivo') {
@@ -893,7 +897,7 @@
         }
 
         function processSale() {
-            if(cart.length === 0) return;
+            if(cart.length === 0) return alert("Añade al menos un producto o servicio al carrito.");
 
             const total = calculateTotals();
             const client = document.getElementById('cart-client').value || "Cliente Varios";
@@ -911,16 +915,15 @@
                 cashAmount = parseFloat(document.getElementById('mixed-cash-amount').value) || 0;
 
                 if ((yapeAmount + cashAmount) < total) {
-                    return;
+                    return alert("El monto ingresado en Yape + Efectivo es menor al total a pagar.");
                 }
             }
 
             const finalCartItems = cart.map(i => {
-                const disc = parseFloat(i.discount) || 0;
+                const numDiscount = parseFloat(i.discount) || 0;
                 return {
                     ...i,
-                    discount: disc,
-                    finalPrice: Math.max(0, (i.price * i.qty) - disc) / i.qty
+                    finalPrice: Math.max(0, (i.price * i.qty) - numDiscount) / i.qty
                 };
             });
 
@@ -961,6 +964,7 @@
             renderShortcuts();
             renderInventoryTables();
             updateTotalPurchaseCost();
+            alert("¡Venta completada con éxito!");
         }
 
         function renderInventoryTables() {
@@ -1071,11 +1075,13 @@
         }
 
         function deleteItem(id) {
-            itemsCatalog = itemsCatalog.filter(i => i.id !== id);
-            saveToStorage();
-            renderCatalog();
-            renderInventoryTables();
-            updateTotalPurchaseCost();
+            if (confirm("¿Estás seguro de que deseas eliminar este ítem?")) {
+                itemsCatalog = itemsCatalog.filter(i => i.id !== id);
+                saveToStorage();
+                renderCatalog();
+                renderInventoryTables();
+                updateTotalPurchaseCost();
+            }
         }
 
         function calcTireProfit() {
@@ -1501,6 +1507,7 @@
                         itemsCatalog = data.catalog;
                         salesHistory = data.sales;
                     } else {
+                        alert("Estructura de archivo no válida.");
                         return;
                     }
 
@@ -1510,8 +1517,9 @@
                     renderCart();
                     renderInventoryTables();
                     updateTotalPurchaseCost();
+                    alert("¡Datos cargados con éxito!");
                 } catch (err) {
-                    // Carga fallida
+                    alert("Error al cargar el archivo de respaldo.");
                 }
             };
             reader.readAsText(file);
