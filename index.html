@@ -314,7 +314,7 @@
                 </h3>
                 <form id="form-add-service" onsubmit="addService(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <input type="text" id="serv-name" placeholder="Servicio (Ej. Enllante, Balanceo)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
-                    <input type="text" id="serv-tire-num" placeholder="N° de Llanta (Ej. N° 15, R16)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <input type="text" id="serv-tire-num" placeholder="N° de Llanta (Ej. N° 16, R16)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <input type="number" step="0.1" id="serv-cost" placeholder="Costo del Servicio (S/.)" required class="p-2 border rounded dark:bg-gray-800 dark:border-gray-700">
                     <button type="submit" class="bg-gray-800 dark:bg-gray-700 hover:bg-black text-white px-6 py-2 rounded-lg font-bold transition"> Guardar Servicio</button>
                 </form>
@@ -1338,22 +1338,40 @@
                 const sDate = new Date(s.date);
                 const dateStr = sDate.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const timeStr = sDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
-                
-                let paymentBadge = s.paymentMethod === 'yape' 
-                    ? `<span class="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Yape</span>`
-                    : (s.paymentMethod === 'mixto' 
-                        ? `<span class="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Mixto</span>`
-                        : `<span class="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Efectivo</span>`);
 
                 s.items.forEach(i => {
                     const priceToUse = i.finalPrice !== undefined ? i.finalPrice : i.price;
                     const amount = priceToUse * i.qty;
+
+                    let paymentBadge = "";
+                    let itemYapeAmount = 0;
+
+                    if (s.paymentMethod === 'yape') {
+                        paymentBadge = `<span class="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Yape</span>`;
+                        itemYapeAmount = amount;
+                    } else if (s.paymentMethod === 'efectivo') {
+                        paymentBadge = `<span class="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 px-1.5 py-0.5 rounded font-bold uppercase text-[10px]">Efectivo</span>`;
+                        itemYapeAmount = 0;
+                    } else if (s.paymentMethod === 'mixto') {
+                        const saleTotal = s.total || 1;
+                        const propEf = (s.cashAmount || 0) / saleTotal;
+                        const propYape = (s.yapeAmount || 0) / saleTotal;
+
+                        const itemCashAmount = amount * propEf;
+                        itemYapeAmount = amount * propYape;
+
+                        paymentBadge = `<span class="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold text-[10px] block text-center" title="Pago Mixto">
+                            Ef: S/. ${itemCashAmount.toFixed(2)}<br>Yape: S/. ${itemYapeAmount.toFixed(2)}
+                        </span>`;
+                    }
+
                     const itemDetail = {
                         dateTime: `${dateStr} ${timeStr}`,
                         name: i.name,
                         qty: i.qty,
                         paymentBadge,
-                        total: amount
+                        total: amount,
+                        itemYapeAmount
                     };
 
                     if(i.type === 'llanta') {
@@ -1361,25 +1379,25 @@
                         tireCounts[i.name] = (tireCounts[i.name] || 0) + i.qty;
                         tiresSalesList.push(itemDetail);
 
-                        if(s.paymentMethod === 'yape' || s.paymentMethod === 'mixto') {
+                        if(itemYapeAmount > 0) {
                             yapeTiresList.push(itemDetail);
-                            yapeTiresTotal += amount;
+                            yapeTiresTotal += itemYapeAmount;
                         }
                     } else if(i.type === 'servicio') {
                         totalServ += amount;
                         servicesSalesList.push(itemDetail);
 
-                        if(s.paymentMethod === 'yape' || s.paymentMethod === 'mixto') {
+                        if(itemYapeAmount > 0) {
                             yapeServicesList.push(itemDetail);
-                            yapeServicesTotal += amount;
+                            yapeServicesTotal += itemYapeAmount;
                         }
                     } else if(i.type === 'producto') {
                         totalProd += amount;
                         productsSalesList.push(itemDetail);
 
-                        if(s.paymentMethod === 'yape' || s.paymentMethod === 'mixto') {
+                        if(itemYapeAmount > 0) {
                             yapeProductsList.push(itemDetail);
-                            yapeProductsTotal += amount;
+                            yapeProductsTotal += itemYapeAmount;
                         }
                     }
                 });
@@ -1459,7 +1477,7 @@
                         <td class="p-2 whitespace-nowrap text-[11px] text-gray-500">${i.dateTime}</td>
                         <td class="p-2 font-bold">${i.name}</td>
                         <td class="p-2 text-center font-mono">${i.qty}</td>
-                        <td class="p-2 text-right font-bold text-purple-600 dark:text-purple-300">S/. ${i.total.toFixed(2)}</td>
+                        <td class="p-2 text-right font-bold text-purple-600 dark:text-purple-300">S/. ${i.itemYapeAmount.toFixed(2)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
