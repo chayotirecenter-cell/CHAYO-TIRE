@@ -778,7 +778,6 @@
             });
         }
 
-        // AGREGAR AL CARRITO CON DESCUENTO INICIALIZADO EN BLANCO ("")
         function addToCart(id) {
             const item = itemsCatalog.find(i => i.id === id);
             const inCart = cart.find(c => c.id === id);
@@ -964,7 +963,6 @@
             renderShortcuts();
             renderInventoryTables();
             updateTotalPurchaseCost();
-            alert("¡Venta completada con éxito!");
         }
 
         function renderInventoryTables() {
