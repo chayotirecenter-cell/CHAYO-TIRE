@@ -129,7 +129,7 @@
                             </div>
                         </div>
 
-                        <!-- LISTA CARRITO CON DESCUENTO INDIVIDUAL -->
+                        <!-- LISTA CARRITO CON DESCUENTO INDIVIDUAL SIN VALOR POR DEFECTO -->
                         <div class="max-h-64 overflow-y-auto mb-4 border-b dark:border-gray-700 pb-2">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">
@@ -669,7 +669,6 @@
             initCharts();
         });
 
-        // SOLUCIÓN AL PARPADEO: Cambio de pestaña suave sin recargas
         function switchTab(tabName) {
             ['caja', 'almacen', 'reportes'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -779,7 +778,7 @@
             });
         }
 
-        // AGREGAR AL CARRITO CON DESCUENTO INDIVIDUAL PERMITIDO
+        // AGREGAR AL CARRITO (DESCUENTO INICIALIZADO EN BLANCO/VACÍO)
         function addToCart(id) {
             const item = itemsCatalog.find(i => i.id === id);
             const inCart = cart.find(c => c.id === id);
@@ -792,13 +791,13 @@
                 if((item.type === 'llanta' || item.type === 'producto') && item.stock <= 0) {
                     return;
                 }
-                cart.push({ ...item, qty: 1, discount: 0 });
+                cart.push({ ...item, qty: 1, discount: "" });
             }
             renderCart();
         }
 
         function updateCartDiscount(index, val) {
-            cart[index].discount = Math.max(0, parseFloat(val) || 0);
+            cart[index].discount = val;
             calculateTotals();
         }
 
@@ -833,7 +832,8 @@
             tbody.innerHTML = "";
 
             cart.forEach((item, index) => {
-                const itemTotal = Math.max(0, (item.price * item.qty) - (item.discount || 0));
+                const discountVal = parseFloat(item.discount) || 0;
+                const itemTotal = Math.max(0, (item.price * item.qty) - discountVal);
                 const tr = document.createElement('tr');
                 tr.className = "border-b dark:border-gray-800";
                 tr.innerHTML = `
@@ -849,7 +849,7 @@
                         </div>
                     </td>
                     <td class="p-1 text-center">
-                        <input type="number" min="0" step="0.5" value="${item.discount || 0}" onkeyup="updateCartDiscount(${index}, this.value)" onchange="updateCartDiscount(${index}, this.value)" class="w-14 p-1 border rounded text-right text-xs dark:bg-gray-800 dark:border-gray-700 font-bold text-red-500">
+                        <input type="number" min="0" step="0.5" placeholder="0.00" value="${item.discount !== undefined ? item.discount : ''}" onkeyup="updateCartDiscount(${index}, this.value)" onchange="updateCartDiscount(${index}, this.value)" class="w-16 p-1 border rounded text-right text-xs dark:bg-gray-800 dark:border-gray-700 font-bold text-red-500 outline-none">
                     </td>
                     <td class="p-1 text-right font-bold text-chayoRed">S/. ${itemTotal.toFixed(2)}</td>
                     <td class="p-1 text-center">
@@ -863,7 +863,10 @@
         }
 
         function calculateTotals() {
-            let total = cart.reduce((acc, i) => acc + Math.max(0, (i.price * i.qty) - (i.discount || 0)), 0);
+            let total = cart.reduce((acc, i) => {
+                const disc = parseFloat(i.discount) || 0;
+                return acc + Math.max(0, (i.price * i.qty) - disc);
+            }, 0);
             document.getElementById('cart-total-text').innerText = `S/. ${total.toFixed(2)}`;
 
             if (selectedPaymentMethod === 'efectivo') {
@@ -912,10 +915,14 @@
                 }
             }
 
-            const finalCartItems = cart.map(i => ({
-                ...i,
-                finalPrice: Math.max(0, (i.price * i.qty) - (i.discount || 0)) / i.qty
-            }));
+            const finalCartItems = cart.map(i => {
+                const disc = parseFloat(i.discount) || 0;
+                return {
+                    ...i,
+                    discount: disc,
+                    finalPrice: Math.max(0, (i.price * i.qty) - disc) / i.qty
+                };
+            });
 
             const sale = {
                 id: Date.now(),
@@ -1214,7 +1221,6 @@
             });
         }
 
-        /* --- FILTRADO AVANZADO DE REPORTES CON BOTONES Y SEMANAS --- */
         function setPeriod(period) {
             activeTimeframe = period;
             document.getElementById('report-single-date').value = "";
@@ -1375,18 +1381,15 @@
                 });
             });
 
-            // Tarjetas globales
             document.getElementById('report-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
             document.getElementById('report-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('report-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
             document.getElementById('report-total-combined').innerText = `S/. ${(totalTires + totalServ + totalProd).toFixed(2)}`;
 
-            // Subtotales esquinas superiores
             document.getElementById('list-total-tires').innerText = `S/. ${totalTires.toFixed(2)}`;
             document.getElementById('list-total-services').innerText = `S/. ${totalServ.toFixed(2)}`;
             document.getElementById('list-total-products').innerText = `S/. ${totalProd.toFixed(2)}`;
 
-            // Yape acumulados
             document.getElementById('yape-tires-total').innerText = `S/. ${yapeTiresTotal.toFixed(2)}`;
             document.getElementById('yape-services-total').innerText = `S/. ${yapeServicesTotal.toFixed(2)}`;
             document.getElementById('yape-products-total').innerText = `S/. ${yapeProductsTotal.toFixed(2)}`;
@@ -1396,7 +1399,6 @@
             renderReportTables(tiresSalesList, servicesSalesList, productsSalesList);
             renderYapeTables(yapeTiresList, yapeServicesList, yapeProductsList);
 
-            // Actualización de gráficos
             barChartInstance.data.datasets[0].data = [totalTires, totalServ, totalProd];
             barChartInstance.update();
 
